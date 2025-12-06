@@ -66,7 +66,7 @@ export function getPersonWord(count) {
  * Připraví data pro vyplnění šablony smlouvy
  */
 export function formatContractData(formData) {
-    const { tenant, subtenant, roomVariantId, dateFrom, dateTo, signingDate } = formData;
+    const { tenant, subtenant, roomVariantId, dateFrom, dateTo, signingDate, hasSubtenant } = formData;
 
     // Najdi variantu pokoje
     const roomVariant = contractConfig.roomVariants.find(r => r.id === roomVariantId);
@@ -74,9 +74,8 @@ export function formatContractData(formData) {
         throw new Error('Nenalezena varianta pokoje');
     }
 
-    // Počet osob
-    const numberOfOccupants = subtenant ? 2 : 1;
-    const hasSubtenant = numberOfOccupants === 2;
+    // Počet osob - použij hasSubtenant z formData
+    const numberOfOccupants = hasSubtenant ? 2 : 1;
 
     // Výpočty
     const totalFee = calculateTotalFee(roomVariant, numberOfOccupants);
@@ -139,7 +138,7 @@ export function formatContractData(formData) {
         COPIES_PER_PARTY: copiesPerParty,
     };
 
-    // Přidej sekci pro podnájemníka, pokud existuje
+    // Přidej sekci pro podnájemníka, pouze pokud má user zaškrtnutý checkbox
     if (hasSubtenant && subtenant) {
         const subtenantData = {
             SUBTENANT_NAME: `${subtenant.firstName} ${subtenant.lastName}`,
@@ -150,12 +149,13 @@ export function formatContractData(formData) {
         };
 
         templateData.SUBTENANT_SECTION = fillTemplate(contractConfig.subtenantSection, subtenantData);
-        templateData.SUBTENANT_SIGNATURE = contractConfig.subtenantSignature;
+        templateData.SUBTENANT_SIGNATURE = fillTemplate(contractConfig.subtenantSignature, subtenantData);
         templateData.SUBTENANT_PROTOCOL_SECTION = fillTemplate(
             contractConfig.subtenantProtocolSection,
             subtenantData
         );
     } else {
+        // Pokud není podnájemce, vynech tyto sekce úplně
         templateData.SUBTENANT_SECTION = '';
         templateData.SUBTENANT_SIGNATURE = '';
         templateData.SUBTENANT_PROTOCOL_SECTION = '';
