@@ -14,8 +14,8 @@ if (pdfFonts.pdfMake) {
  * Převede HTML text na pdfmake formát
  */
 function htmlToContent(htmlText) {
-    // Nahradíme \n za <br> aby se zachovaly odřádkování
-    const html = htmlText.replace(/\n/g, '<br />');
+    // Odstraníme \n protože HTML má vlastní strukturu
+    const html = htmlText;
 
     // Převedeme HTML na pdfmake formát
     const content = htmlToPdfmake(html, {
@@ -32,7 +32,9 @@ function htmlToContent(htmlText) {
             h3: { fontSize: 12, bold: true, margin: [0, 6, 0, 3] },
             a: { color: 'blue', decoration: 'underline' },
             li: { margin: [0, 2, 0, 2] }
-        }
+        },
+        // Ignorujeme inline styles (včetně font-family)
+        ignoreStyles: ['font-family', 'font-size', 'line-height', 'color']
     });
 
     return content;

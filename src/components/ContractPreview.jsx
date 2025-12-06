@@ -37,9 +37,7 @@ export default function ContractPreview({ formData }) {
                     <div
                         className="preview-content"
                         dangerouslySetInnerHTML={{
-                            __html: activeTab === 'contract'
-                                ? contractText.replace(/\n/g, '<br />')
-                                : protocolText.replace(/\n/g, '<br />')
+                            __html: activeTab === 'contract' ? contractText : protocolText
                         }}
                     />
                 </div>
