@@ -103,42 +103,28 @@ export const contractConfig = {
   contractTemplate: `
 <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; color: #000;">
   
-  <p style="text-align: center; font-size: 14pt; font-weight: bold; margin: 10px 0;">
+  <div style="text-align: center; font-size: 14pt; font-weight: bold; margin: 10px 0;">
     Nájemní smlouva – pronájem bytu
-  </p>
-  
-  <p style="text-align: center; font-size: 9pt; margin-bottom: 10px;">
+    <p style="text-align: center; font-size: 9pt; margin-bottom: 10px;">
     dle § 2235 a násl. zákona č. 89/2012 Sb., občanského zákoníku, ve znění pozdějších předpisů
   </p>
+  </div>
 
-  <table cellspacing="0" cellpadding="5" style="width: 100%; border: 2pt solid #000; border-collapse: collapse; margin: 10px 0; font-size: 10pt;">
-    <tr>
-      <td colspan="2" style="border-bottom: 1pt solid #000; padding: 7px 5px; font-weight: bold; font-size: 10pt;">
-        1. SMLUVNÍ STRANY
-      </td>
-    </tr>
-    <tr>
-      <td style="width: 25%; border-bottom: 1pt solid #000; padding: 5px; font-weight: bold; vertical-align: top;">
-        Pronajímatel:
-      </td>
-      <td style="border-bottom: 1pt solid #000; padding: 5px; font-size: 9pt;">
-        {{LANDLORD_NAME}}, narozen(a) {{LANDLORD_BIRTH_NUMBER}}<br>
-        Trvale bytem: {{LANDLORD_ADDRESS}}<br>
-        Telefon: {{LANDLORD_PHONE}}, e-mail: {{LANDLORD_EMAIL}}
-      </td>
-    </tr>
-    <tr>
-      <td style="border-bottom: 2pt solid #000; padding: 5px; font-weight: bold; vertical-align: top;">
-        Nájemce:
-      </td>
-      <td style="border-bottom: 2pt solid #000; padding: 5px;">
-        <p style="margin: 3px 0; font-size: 10pt;">Jméno: {{TENANT_NAME}}</p>
-        <p style="margin: 3px 0; font-size: 10pt;">Trvale bytem: {{TENANT_ADDRESS}}</p>
-        <p style="margin: 3px 0; font-size: 10pt;">Narozen(a): {{TENANT_BIRTH_NUMBER}} | Číslo dokladu: {{TENANT_BIRTH_NUMBER}}</p>
-        <p style="margin: 3px 0; font-size: 10pt;">Telefon: {{TENANT_PHONE}} | E-mail: {{TENANT_EMAIL}}</p>
-      </td>
-    </tr>
-  </table>
+  <div style="border: 2pt solid #000; padding: 10px; margin: 10px 0;">
+    <p style="font-weight: bold; font-size: 10pt; margin: 0 0 8px 0;">1. SMLUVNÍ STRANY</p>
+    
+    <div style="margin-bottom: 8px;">
+      <p style="margin: 2px 0; font-size: 9pt;"><strong>Pronajímatel:</strong> {{LANDLORD_NAME}}, narozen(a) {{LANDLORD_BIRTH_NUMBER}}</p>
+      <p style="margin: 2px 0; font-size: 9pt;">Trvale bytem: {{LANDLORD_ADDRESS}}</p>
+      <p style="margin: 2px 0; font-size: 9pt;">Telefon: {{LANDLORD_PHONE}}, e-mail: {{LANDLORD_EMAIL}}</p>
+    </div>
+
+    <div>
+      <p style="margin: 2px 0; font-size: 9pt;"><strong>Nájemce:</strong> {{TENANT_NAME}}, narozen(a) {{TENANT_BIRTH_NUMBER}}, číslo dokladu: {{TENANT_BIRTH_NUMBER}}</p>
+      <p style="margin: 2px 0; font-size: 9pt;">Trvale bytem: {{TENANT_ADDRESS}}</p>
+      <p style="margin: 2px 0; font-size: 9pt;">Telefon: {{TENANT_PHONE}}, e-mail: {{TENANT_EMAIL}}</p>
+    </div>
+  </div>
 
   {{SUBTENANT_SECTION}}
 
@@ -286,88 +272,126 @@ export const contractConfig = {
     <li style="margin-bottom: 5px;">Smluvní strany prohlašují, že před podpisem tuto smlouvu řádně projednaly a přečetly, že je sepsána podle jejich pravé a svobodné vůle.</li>
   </ol>
 
-  <p style="margin: 20px 0 10px 0;">V {{SIGNING_PLACE}} dne {{SIGNING_DATE}}</p>
-
-  <table style="width: 100%; margin-top: 20px;">
-    <tr>
-      <td style="width: 50%; text-align: center; border-top: 1px solid #000; padding-top: 5px;">Podpis pronajímatele</td>
-      <td style="width: 50%; text-align: center; border-top: 1px solid #000; padding-top: 5px;">Podpis nájemce</td>
-    </tr>
-  </table>
+  <div style="margin: 30px 0 10px 0;">
+    <p style="margin-bottom: 30px;">V {{SIGNING_PLACE}} dne {{SIGNING_DATE}}</p>
+    
+    <div style="display: flex; justify-content: space-between; margin-top: 40px;">
+      <div style="text-align: center; width: 45%;">
+        <div style="border-top: 1px solid #000; padding-top: 5px;">
+          <p style="margin: 0; font-size: 9pt;">{{LANDLORD_NAME}}</p>
+          <p style="margin: 0; font-size: 9pt;">Pronajímatel</p>
+        </div>
+      </div>
+      <div style="text-align: center; width: 45%;">
+        <div style="border-top: 1px solid #000; padding-top: 5px;">
+          <p style="margin: 0; font-size: 9pt;">{{TENANT_NAME}}</p>
+          <p style="margin: 0; font-size: 9pt;">Nájemce</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   {{SUBTENANT_SIGNATURE}}
 
 </div>`,
 
-  // Šablona pro sekci podnájemníka (HTML)
+  // Šablona pro sekci podnájemníka (HTML) - zjednodušená
   subtenantSection: `
-  <table cellspacing="0" cellpadding="5" style="width: 100%; border: 2pt solid #000; border-collapse: collapse; margin: 20px 0; font-size: 10pt;">
-    <tr>
-      <td style="width: 25%; border-bottom: 2pt solid #000; padding: 5px; font-weight: bold; vertical-align: top;">
-        Podnájemce:
-      </td>
-      <td style="border-bottom: 2pt solid #000; padding: 5px;">
-        <p style="margin: 3px 0; font-size: 10pt;">Jméno: {{SUBTENANT_NAME}}</p>
-        <p style="margin: 3px 0; font-size: 10pt;">Trvale bytem: {{SUBTENANT_ADDRESS}}</p>
-        <p style="margin: 3px 0; font-size: 10pt;">Narozen(a): {{SUBTENANT_BIRTH_NUMBER}} | Číslo dokladu: {{SUBTENANT_BIRTH_NUMBER}}</p>
-        <p style="margin: 3px 0; font-size: 10pt;">Telefon: {{SUBTENANT_PHONE}} | E-mail: {{SUBTENANT_EMAIL}}</p>
-      </td>
-    </tr>
-  </table>
+  <div style="border: 2pt solid #000; padding: 10px; margin: 10px 0;">
+    <p style="margin: 0; font-size: 9pt;"><strong>Podnájemce:</strong> {{SUBTENANT_NAME}}, narozen(a) {{SUBTENANT_BIRTH_NUMBER}}, {{SUBTENANT_ADDRESS}}, tel.: {{SUBTENANT_PHONE}}, email: {{SUBTENANT_EMAIL}}</p>
+  </div>
   `,
 
   subtenantSignature: `
-  <table style="width: 100%; margin-top: 20px;">
-    <tr>
-      <td style="width: 33.33%; text-align: center;"></td>
-      <td style="width: 33.33%; text-align: center;"></td>
-      <td style="width: 33.33%; text-align: center; border-top: 1px solid #000; padding-top: 5px;">Podpis podnájemce</td>
-    </tr>
-  </table>
+  <div style="text-align: center; margin-top: 20px;">
+    <div style="display: inline-block; border-top: 1px solid #000; padding-top: 5px; min-width: 200px;">
+      <p style="margin: 0; font-size: 9pt;">{{SUBTENANT_NAME}}</p>
+      <p style="margin: 0; font-size: 9pt;">Podnájemce</p>
+    </div>
+  </div>
   `,
 
-  // Šablona předávacího protokolu
-  handoverProtocolTemplate: `PŘEDÁVACÍ PROTOKOL
+  // Šablona předávacího protokolu (HTML)
+  handoverProtocolTemplate: `
+<div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; color: #000;">
+  
+  <div style="text-align: center; font-size: 14pt; font-weight: bold; margin: 10px 0;">
+    Předávací protokol
+    <p style="text-align: center; font-size: 10pt; margin: 5px 0;">
+      k nájemní smlouvě uzavřené dne {{SIGNING_DATE}}
+    </p>
+  </div>
 
-k nájemní smlouvě uzavřené dne {{SIGNING_DATE}}
+  <div style="border: 2pt solid #000; padding: 10px; margin: 10px 0;">
+    <p style="margin: 2px 0; font-size: 9pt;"><strong>Pronajímatel:</strong> {{LANDLORD_NAME}}</p>
+    <p style="margin: 2px 0; font-size: 9pt;"><strong>Nájemce:</strong> {{TENANT_NAME}}</p>
+    {{SUBTENANT_PROTOCOL_SECTION}}
+    <p style="margin: 2px 0; font-size: 9pt;"><strong>Předmět nájmu:</strong> {{ROOM_NAME}}, {{PROPERTY_ADDRESS}}</p>
+  </div>
 
-Pronajímatel: {{LANDLORD_NAME}}
-Nájemce: {{TENANT_NAME}}
-{{SUBTENANT_PROTOCOL_SECTION}}
+  <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">I. STAV POKOJE PŘI PŘEDÁNÍ</p>
+  <p style="margin: 0 0 10px 0; font-size: 9pt;">Pokoj je předáván v řádném stavu, čistý a funkční.</p>
 
-Předmět nájmu: {{ROOM_NAME}}, {{PROPERTY_ADDRESS}}
+  <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">II. VYBAVENÍ POKOJE</p>
+  <div style="margin: 0 0 10px 20px; font-size: 9pt;">{{ROOM_FEATURES}}</div>
 
-I. STAV POKOJE PŘI PŘEDÁNÍ
+  <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">III. STAVY MĚŘIČŮ</p>
+  <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt;">
+    <tr>
+      <td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">Elektřina (číslo měřiče: {{ELECTRICITY_METER}}):</td>
+      <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 30%;">__________ {{ELECTRICITY_UNIT}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">Studená voda (číslo měřiče: {{COLD_WATER_METER}}):</td>
+      <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 30%;">__________ {{COLD_WATER_UNIT}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">Teplá voda (číslo měřiče: {{HOT_WATER_METER}}):</td>
+      <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 30%;">__________ {{HOT_WATER_UNIT}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">Plyn (číslo měřiče: {{GAS_METER}}):</td>
+      <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 30%;">__________ {{GAS_UNIT}}</td>
+    </tr>
+  </table>
 
-Pokoj je předáván v řádném stavu, čistý a funkční.
+  <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">IV. PŘEDÁNÍ KLÍČŮ</p>
+  <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt;">
+    <tr>
+      <td style="padding: 3px 5px;">Počet předaných klíčů od pokoje:</td>
+      <td style="padding: 3px 5px; width: 30%;">__________</td>
+    </tr>
+    <tr>
+      <td style="padding: 3px 5px;">Počet předaných klíčů od vchodu:</td>
+      <td style="padding: 3px 5px; width: 30%;">__________</td>
+    </tr>
+  </table>
 
-II. VYBAVENÍ POKOJE
+  <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">V. ZÁVĚRY</p>
+  <p style="margin: 0 0 20px 0; font-size: 9pt;">Nájemce stvrzuje převzetí pokoje ve výše uvedeném stavu a zavazuje se jej v tomto stavu udržovat.</p>
 
-{{ROOM_FEATURES}}
+  <div style="margin: 30px 0 10px 0;">
+    <p style="margin-bottom: 30px;">V {{SIGNING_PLACE}} dne {{SIGNING_DATE}}</p>
+    
+    <div style="display: flex; justify-content: space-between; margin-top: 40px;">
+      <div style="text-align: center; width: 45%;">
+        <div style="border-top: 1px solid #000; padding-top: 5px;">
+          <p style="margin: 0; font-size: 9pt;">{{LANDLORD_NAME}}</p>
+          <p style="margin: 0; font-size: 9pt;">Pronajímatel</p>
+        </div>
+      </div>
+      <div style="text-align: center; width: 45%;">
+        <div style="border-top: 1px solid #000; padding-top: 5px;">
+          <p style="margin: 0; font-size: 9pt;">{{TENANT_NAME}}</p>
+          <p style="margin: 0; font-size: 9pt;">Nájemce</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-III. STAVY MĚŘIČŮ
+  {{SUBTENANT_SIGNATURE}}
 
-Elektřina (číslo měřiče: {{ELECTRICITY_METER}}): __________ {{ELECTRICITY_UNIT}}
-Studená voda (číslo měřiče: {{COLD_WATER_METER}}): __________ {{COLD_WATER_UNIT}}
-Teplá voda (číslo měřiče: {{HOT_WATER_METER}}): __________ {{HOT_WATER_UNIT}}
-Plyn (číslo měřiče: {{GAS_METER}}): __________ {{GAS_UNIT}}
+</div>`,
 
-IV. PŘEDÁNÍ KLÍČŮ
-
-Počet předaných klíčů od pokoje: __________
-Počet předaných klíčů od vchodu: __________
-
-V. ZÁVĚRY
-
-Nájemce stvrzuje převzetí pokoje ve výše uvedeném stavu a zavazuje se jej v tomto stavu udržovat.
-
-V {{SIGNING_PLACE}} dne {{SIGNING_DATE}}
-
-
-___________________________          ___________________________
-Podpis pronajímatele                 Podpis nájemce
-
-{{SUBTENANT_SIGNATURE}}`,
-
-  subtenantProtocolSection: `Podnájemce: {{SUBTENANT_NAME}}`
+  subtenantProtocolSection: `<p style="margin: 2px 0; font-size: 9pt;"><strong>Podnájemce:</strong> {{SUBTENANT_NAME}}</p>`
 };
