@@ -82,6 +82,9 @@ export const contractConfig = {
     currency: "Kč"
   },
 
+  // Výchozí doba trvání nájmu (v letech)
+  defaultContractDuration: 2,
+
   // Šablona nájemní smlouvy
   contractTemplate: `SMLOUVA O PODNÁJMU BYTU
 
@@ -91,14 +94,14 @@ I. SMLUVNÍ STRANY
 
 1. Pronajímatel
 Jméno: {{LANDLORD_NAME}}
-Rodné číslo: {{LANDLORD_BIRTH_NUMBER}}
+Číslo dokladu: {{LANDLORD_BIRTH_NUMBER}}
 Trvalé bydliště: {{LANDLORD_ADDRESS}}
 Telefon: {{LANDLORD_PHONE}}
 E-mail: {{LANDLORD_EMAIL}}
 
 2. Nájemce
 Jméno: {{TENANT_NAME}}
-Rodné číslo: {{TENANT_BIRTH_NUMBER}}
+Číslo dokladu: {{TENANT_BIRTH_NUMBER}}
 Trvalé bydliště: {{TENANT_ADDRESS}}
 Telefon: {{TENANT_PHONE}}
 E-mail: {{TENANT_EMAIL}}
@@ -162,7 +165,7 @@ Podpis pronajímatele                 Podpis nájemce
   subtenantSection: `
 3. Podnájemce
 Jméno: {{SUBTENANT_NAME}}
-Rodné číslo: {{SUBTENANT_BIRTH_NUMBER}}
+Číslo dokladu: {{SUBTENANT_BIRTH_NUMBER}}
 Trvalé bydliště: {{SUBTENANT_ADDRESS}}
 Telefon: {{SUBTENANT_PHONE}}
 E-mail: {{SUBTENANT_EMAIL}}`,

@@ -106,24 +106,24 @@ export default function ContractForm() {
     };
 
     const updateFormData = (field, value) => {
-        setFormData({
-            ...formData,
+        setFormData((prevFormData) => ({
+            ...prevFormData,
             [field]: value
-        });
+        }));
     };
 
     const updateTenant = (tenant) => {
-        setFormData({
-            ...formData,
+        setFormData((prevFormData) => ({
+            ...prevFormData,
             tenant
-        });
+        }));
     };
 
     const updateSubtenant = (subtenant) => {
-        setFormData({
-            ...formData,
+        setFormData((prevFormData) => ({
+            ...prevFormData,
             subtenant
-        });
+        }));
     };
 
     // Určení, které kroky jsou dokončené

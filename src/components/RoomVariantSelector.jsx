@@ -36,11 +36,6 @@ export default function RoomVariantSelector({ selectedId, onChange }) {
                                 </div>
 
                                 <div className="room-card-detail">
-                                    <span className="room-card-detail-label">Výměra</span>
-                                    <span className="room-card-detail-value">{variant.area} m²</span>
-                                </div>
-
-                                <div className="room-card-detail">
                                     <span className="room-card-detail-label">Měsíční nájem</span>
                                     <span className="room-card-detail-value">
                                         {variant.monthlyRent.toLocaleString('cs-CZ')} Kč

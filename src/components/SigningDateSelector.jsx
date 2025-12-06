@@ -23,35 +23,38 @@ export default function SigningDateSelector({ signingDate, onChange }) {
                 Určete datum podpisu smlouvy
             </p>
 
-            <div className="form-group">
-                <label className="checkbox-wrapper">
-                    <input
-                        type="checkbox"
-                        checked={useToday}
-                        onChange={(e) => handleUseTodayToggle(e.target.checked)}
-                    />
-                    <span>Použít dnešní datum</span>
-                </label>
+            <div className="form-grid form-grid-2">
+                <div className="form-group">
+                    <label className="checkbox-wrapper" style={{ height: '100%', alignItems: 'center' }}>
+                        <input
+                            type="checkbox"
+                            checked={useToday}
+                            onChange={(e) => handleUseTodayToggle(e.target.checked)}
+                        />
+                        <span>Použít dnešní datum</span>
+                    </label>
+                </div>
+
+                <div className="form-group">
+                    {!useToday && (
+                        <>
+                            <label className="form-label" htmlFor="signingDate">
+                                Vlastní datum podpisu
+                            </label>
+                            <input
+                                id="signingDate"
+                                type="date"
+                                className="form-input"
+                                value={signingDate || ''}
+                                onChange={(e) => onChange(e.target.value)}
+                            />
+                        </>
+                    )}
+                </div>
             </div>
 
-            {!useToday && (
-                <div className="form-group">
-                    <label className="form-label" htmlFor="signingDate">
-                        Vlastní datum podpisu
-                    </label>
-                    <input
-                        id="signingDate"
-                        type="date"
-                        className="form-input"
-                        value={signingDate || ''}
-                        onChange={(e) => onChange(e.target.value)}
-                    />
-                    <span className="form-hint">Nechte prázdné pro použití dnešního data</span>
-                </div>
-            )}
-
             {signingDate && (
-                <div className="form-group">
+                <div className="form-group" style={{ marginTop: 'var(--space-md)' }}>
                     <p style={{ color: 'var(--color-text-secondary)' }}>
                         Smlouva bude podepsána: <strong>{format(new Date(signingDate), 'd. M. yyyy')}</strong>
                     </p>

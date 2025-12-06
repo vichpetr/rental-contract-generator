@@ -3,32 +3,47 @@
  */
 
 /**
- * Validuje rodné číslo
- * Formát: RRMMDD/XXXX (před 1954) nebo RRMMDD/XXX (po 1954)
+ * Validuje číslo dokladu (rodné číslo nebo číslo pasu)
+ * Formát rodného čísla: RRMMDD/XXXX (před 1954) nebo RRMMDD/XXX (po 1954)
+ * Formát pasu: alfanumerický kód (např. AB123456)
  */
 export function validateBirthNumber(birthNumber) {
     if (!birthNumber) {
-        return 'Rodné číslo je povinné';
+        return 'Číslo dokladu je povinné';
     }
 
-    // Odstranění mezer a lomítka
+    const trimmed = birthNumber.trim();
+
+    // Kontrola minimální délky
+    if (trimmed.length < 6) {
+        return 'Číslo dokladu je příliš krátké';
+    }
+
+    // Odstranění mezer a lomítka pro kontrolu rodného čísla
     const cleaned = birthNumber.replace(/\s/g, '').replace('/', '');
 
-    // Kontrola délky
-    if (cleaned.length !== 9 && cleaned.length !== 10) {
-        return 'Rodné číslo musí mít 9 nebo 10 číslic';
-    }
+    // Pokud obsahuje pouze číslice, validujeme jako rodné číslo
+    if (/^\d+$/.test(cleaned)) {
+        // Kontrola délky pro rodné číslo
+        if (cleaned.length !== 9 && cleaned.length !== 10) {
+            return 'Rodné číslo musí mít 9 nebo 10 číslic (formát: RRMMDD/XXXX)';
+        }
 
-    // Kontrola, že jsou všechny znaky číslice
-    if (!/^\d+$/.test(cleaned)) {
-        return 'Rodné číslo může obsahovat pouze číslice';
-    }
+        // Pro rodná čísla s 10 číslicemi kontrola dělitelnosti 11
+        if (cleaned.length === 10) {
+            const num = parseInt(cleaned, 10);
+            if (num % 11 !== 0) {
+                return 'Rodné číslo není platné (neplatný kontrolní součet)';
+            }
+        }
+    } else {
+        // Pro čísla pasů - kontrola alfanumerického formátu
+        if (!/^[A-Z0-9]+$/i.test(cleaned)) {
+            return 'Číslo pasu může obsahovat pouze písmena a číslice';
+        }
 
-    // Pro rodná čísla s 10 číslicemi kontrola dělitelnosti 11
-    if (cleaned.length === 10) {
-        const num = parseInt(cleaned, 10);
-        if (num % 11 !== 0) {
-            return 'Rodné číslo není platné (neplatný kontrolní součet)';
+        if (cleaned.length > 20) {
+            return 'Číslo dokladu je příliš dlouhé';
         }
     }
 

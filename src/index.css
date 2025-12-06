@@ -37,14 +37,14 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
-  /* Spacing */
+  /* Spacing - Optimized for desktop viewport */
   --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
-  --space-2xl: 3rem;
-  --space-3xl: 4rem;
+  --space-sm: 0.4rem;
+  --space-md: 0.75rem;
+  --space-lg: 1rem;
+  --space-xl: 1.25rem;
+  --space-2xl: 1.5rem;
+  --space-3xl: 2rem;
 
   /* Border radius */
   --radius-sm: 0.25rem;
@@ -101,31 +101,31 @@ body {
 .app-header {
   background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
   color: white;
-  padding: var(--space-xl) 0;
+  padding: var(--space-lg) 0;
   box-shadow: var(--shadow-md);
 }
 
 .app-header h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-xs);
 }
 
 .app-header p {
-  font-size: 1rem;
+  font-size: 0.9rem;
   opacity: 0.9;
 }
 
 .app-main {
   flex: 1;
-  padding: var(--space-2xl) 0;
+  padding: var(--space-lg) 0;
 }
 
 .app-footer {
-  padding: var(--space-lg);
+  padding: var(--space-md);
   text-align: center;
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   border-top: 1px solid var(--color-border);
 }
 
@@ -134,7 +134,7 @@ body {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
-  padding: var(--space-xl);
+  padding: var(--space-lg);
   transition: box-shadow var(--transition-normal);
 }
 
@@ -143,11 +143,11 @@ body {
 }
 
 .card-header {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .card-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: var(--space-sm);
@@ -155,18 +155,33 @@ body {
 
 .card-description {
   color: var(--color-text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 /* Form Elements */
+.form-grid {
+  display: grid;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.form-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.form-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .form-group {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .form-label {
   display: block;
   font-weight: 500;
-  margin-bottom: var(--space-sm);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-xs);
   color: var(--color-text);
 }
 
@@ -177,11 +192,11 @@ body {
 
 .form-input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--color-text);
   background: var(--color-surface);
   transition: all var(--transition-fast);
@@ -206,15 +221,15 @@ body {
 .form-error {
   display: block;
   color: var(--color-error);
-  font-size: 0.875rem;
-  margin-top: var(--space-sm);
+  font-size: 0.8rem;
+  margin-top: var(--space-xs);
 }
 
 .form-hint {
   display: block;
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
-  margin-top: var(--space-sm);
+  font-size: 0.8rem;
+  margin-top: var(--space-xs);
 }
 
 /* Checkbox */
@@ -238,11 +253,11 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -310,7 +325,7 @@ body {
 
 /* Progress Bar */
 .progress {
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-lg);
 }
 
 .progress-steps {
@@ -323,7 +338,7 @@ body {
 .progress-steps::before {
   content: '';
   position: absolute;
-  top: 1.25rem;
+  top: 1rem;
   left: 0;
   right: 0;
   height: 2px;
@@ -341,8 +356,8 @@ body {
 }
 
 .progress-step-circle {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: var(--radius-full);
   background: var(--color-surface);
   border: 2px solid var(--color-border);
@@ -350,7 +365,8 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  margin-bottom: var(--space-sm);
+  font-size: 0.85rem;
+  margin-bottom: var(--space-xs);
   transition: all var(--transition-normal);
 }
 
@@ -368,7 +384,7 @@ body {
 }
 
 .progress-step-label {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--color-text-secondary);
   text-align: center;
 }
@@ -382,15 +398,15 @@ body {
 .room-variants {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-lg);
-  margin-bottom: var(--space-xl);
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
 }
 
 .room-card {
   background: var(--color-surface);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-lg);
+  padding: var(--space-md);
   cursor: pointer;
   transition: all var(--transition-normal);
   position: relative;
@@ -409,29 +425,29 @@ body {
 }
 
 .room-card-header {
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .room-card-title {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: var(--space-xs);
 }
 
 .room-card-description {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--color-text-secondary);
 }
 
 .room-card-details {
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .room-card-detail {
   display: flex;
   justify-content: space-between;
-  padding: var(--space-sm) 0;
+  padding: var(--space-xs) 0;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -440,7 +456,7 @@ body {
 }
 
 .room-card-detail-label {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--color-text-secondary);
 }
 
@@ -512,6 +528,11 @@ body {
 
   .card {
     padding: var(--space-lg);
+  }
+
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
   }
 
   .progress-steps {
