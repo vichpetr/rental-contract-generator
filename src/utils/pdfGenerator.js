@@ -1,92 +1,56 @@
-import pdfMake from 'pdfmake/build/pdfmake';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
-import htmlToPdfmake from 'html-to-pdfmake';
+import html2pdf from 'html2pdf.js';
 import { generateContractText, generateHandoverProtocolText } from './contractGenerator';
 
-// Registrace fontů
-if (pdfFonts.pdfMake) {
-    pdfMake.vfs = pdfFonts.pdfMake.vfs;
-} else {
-    pdfMake.vfs = pdfFonts;
+/**
+ * Konfigurace pro html2pdf
+ */
+const defaultOptions = {
+    margin: [6, 6, 6, 6],
+    filename: 'smlouva.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        allowTaint: false,
+        logging: false,
+        windowWidth: 794, // A4 width in pixels at 96 DPI
+        windowHeight: 1123, // A4 height in pixels at 96 DPI
+        scrollY: 0,
+        scrollX: 0,
+        foreignObjectRendering: false
+    },
+    jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait'
+    },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+};
+
+/**
+ * Vytvoří dočasný HTML element s obsahem
+ */
+function createTempElement(htmlContent) {
+    const tempDiv = document.createElement('div');
+    // A4 width (210mm) minus margins (6mm on each side = 12mm total)
+    tempDiv.style.width = '198mm';
+    tempDiv.style.maxWidth = '198mm';
+    tempDiv.style.padding = '0';
+    tempDiv.style.margin = '0';
+    tempDiv.style.boxSizing = 'border-box';
+    tempDiv.innerHTML = htmlContent;
+    document.body.appendChild(tempDiv);
+    return tempDiv;
 }
 
 /**
- * Převede HTML text na pdfmake formát
+ * Odstraní dočasný element
  */
-function htmlToContent(htmlText) {
-    // Odstraníme \n protože HTML má vlastní strukturu
-    const html = htmlText;
-
-    // Převedeme HTML na pdfmake formát
-    const content = htmlToPdfmake(html, {
-        defaultStyles: {
-            b: { bold: true },
-            strong: { bold: true },
-            u: { decoration: 'underline' },
-            s: { decoration: 'lineThrough' },
-            em: { italics: true },
-            i: { italics: true },
-            h1: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] },
-            h2: { fontSize: 13, bold: true, margin: [0, 8, 0, 4] },
-            h3: { fontSize: 12, bold: true, margin: [0, 6, 0, 3] },
-            a: { color: 'blue', decoration: 'underline' },
-            li: { margin: [0, 2, 0, 2] }
-        },
-        // Ignorujeme inline styles kromě width (který potřebujeme pro tabulky)
-        ignoreStyles: ['font-family', 'font-size', 'line-height', 'color']
-    });
-
-    return content;
-}
-
-/**
- * Vytvoří definici PDF dokumentu z HTML obsahu
- */
-function createDocumentDefinitionFromHTML(title, htmlContent) {
-    const content = htmlToContent(htmlContent);
-
-    // Pokud je title prázdný, přidáme jen obsah
-    const contentArray = [];
-    if (title && title.trim()) {
-        contentArray.push({
-            text: title,
-            style: 'title',
-            margin: [0, 0, 0, 15],
-            alignment: 'center'
-        });
+function removeTempElement(element) {
+    if (element && element.parentNode) {
+        document.body.removeChild(element);
     }
-    contentArray.push(...(Array.isArray(content) ? content : [content]));
-
-    return {
-        content: contentArray,
-        styles: {
-            title: {
-                fontSize: 14,
-                bold: true
-            },
-            'html-strong': {
-                bold: true
-            },
-            'html-b': {
-                bold: true
-            }
-        },
-        defaultStyle: {
-            fontSize: 10,
-            lineHeight: 1.3
-        },
-        pageSize: 'A4',
-        pageMargins: [50, 50, 50, 60],
-        // Přidána patička s čísly stránek
-        footer: function (currentPage, pageCount) {
-            return {
-                text: `Strana ${currentPage} z ${pageCount}`,
-                alignment: 'center',
-                fontSize: 9,
-                margin: [0, 10, 0, 0]
-            };
-        }
-    };
 }
 
 /**
@@ -94,9 +58,19 @@ function createDocumentDefinitionFromHTML(title, htmlContent) {
  */
 export function generateContractPDF(formData) {
     const contractText = generateContractText(formData);
-    const docDefinition = createDocumentDefinitionFromHTML('', contractText);
+    const tempDiv = createTempElement(contractText);
 
-    return pdfMake.createPdf(docDefinition);
+    const opt = { ...defaultOptions, filename: 'najemni-smlouva.pdf' };
+
+    return html2pdf()
+        .set(opt)
+        .from(tempDiv)
+        .toPdf()
+        .get('pdf')
+        .then((pdf) => {
+            removeTempElement(tempDiv);
+            return { pdf, save: () => html2pdf().set(opt).from(createTempElement(contractText)).save() };
+        });
 }
 
 /**
@@ -104,9 +78,19 @@ export function generateContractPDF(formData) {
  */
 export function generateHandoverProtocolPDF(formData) {
     const protocolText = generateHandoverProtocolText(formData);
-    const docDefinition = createDocumentDefinitionFromHTML('', protocolText);
+    const tempDiv = createTempElement(protocolText);
 
-    return pdfMake.createPdf(docDefinition);
+    const opt = { ...defaultOptions, filename: 'predavaci-protokol.pdf' };
+
+    return html2pdf()
+        .set(opt)
+        .from(tempDiv)
+        .toPdf()
+        .get('pdf')
+        .then((pdf) => {
+            removeTempElement(tempDiv);
+            return { pdf, save: () => html2pdf().set(opt).from(createTempElement(protocolText)).save() };
+        });
 }
 
 /**
@@ -116,62 +100,74 @@ export function generateBothPDFs(formData) {
     const contractText = generateContractText(formData);
     const protocolText = generateHandoverProtocolText(formData);
 
-    const contractContent = htmlToContent(contractText);
-    const protocolContent = htmlToContent(protocolText);
+    // Spojit oba dokumenty s page break mezi nimi
+    const combinedHTML = `
+        ${contractText}
+        <div style="page-break-after: always;"></div>
+        ${protocolText}
+    `;
 
-    const docDefinition = {
-        content: [
-            ...Array.isArray(contractContent) ? contractContent : [contractContent],
-            {
-                text: '',
-                pageBreak: 'after'
-            },
-            ...Array.isArray(protocolContent) ? protocolContent : [protocolContent]
-        ],
-        styles: {
-            title: {
-                fontSize: 14,
-                bold: true
-            },
-            'html-strong': {
-                bold: true
-            },
-            'html-b': {
-                bold: true
-            }
-        },
-        defaultStyle: {
-            fontSize: 10,
-            lineHeight: 1.3
-        },
-        pageSize: 'A4',
-        pageMargins: [50, 50, 50, 50]
+    const tempDiv = createTempElement(combinedHTML);
+
+    const opt = {
+        ...defaultOptions,
+        filename: `smlouva-${new Date().toISOString().split('T')[0]}.pdf`
     };
 
-    return pdfMake.createPdf(docDefinition);
+    const worker = html2pdf().set(opt).from(tempDiv);
+
+    // Vrátit objekt s metodami pro kompatibilitu
+    return {
+        download: (filename) => {
+            const customOpt = { ...opt, filename };
+            return html2pdf()
+                .set(customOpt)
+                .from(createTempElement(combinedHTML))
+                .save()
+                .then(() => removeTempElement(tempDiv));
+        },
+        save: () => {
+            return worker.save().then(() => removeTempElement(tempDiv));
+        },
+        open: () => {
+            return worker.outputPdf('bloburl').then((url) => {
+                removeTempElement(tempDiv);
+                window.open(url, '_blank');
+            });
+        },
+        getDataUrl: () => {
+            return worker.outputPdf('dataurlstring').then((dataUrl) => {
+                removeTempElement(tempDiv);
+                return dataUrl;
+            });
+        }
+    };
 }
 
 /**
  * Stáhne PDF soubor
  */
-export function downloadPDF(pdf, filename) {
-    pdf.download(filename);
+export function downloadPDF(pdfObject, filename) {
+    if (pdfObject && typeof pdfObject.download === 'function') {
+        return pdfObject.download(filename);
+    }
 }
 
 /**
  * Otevře PDF v novém okně
  */
-export function openPDF(pdf) {
-    pdf.open();
+export function openPDF(pdfObject) {
+    if (pdfObject && typeof pdfObject.open === 'function') {
+        return pdfObject.open();
+    }
 }
 
 /**
  * Získá PDF jako data URL (pro preview)
  */
-export function getPDFDataUrl(pdf) {
-    return new Promise((resolve, reject) => {
-        pdf.getDataUrl((dataUrl) => {
-            resolve(dataUrl);
-        });
-    });
+export function getPDFDataUrl(pdfObject) {
+    if (pdfObject && typeof pdfObject.getDataUrl === 'function') {
+        return pdfObject.getDataUrl();
+    }
+    return Promise.resolve('');
 }

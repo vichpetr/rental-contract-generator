@@ -101,7 +101,7 @@ export const contractConfig = {
 
   // Šablona nájemní smlouvy (HTML)
   contractTemplate: `
-<div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; color: #000;">
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.3; color: #000;">
   
   <div style="text-align: center; font-size: 20pt; font-weight: bold; margin: 10px 0;">
     Nájemní smlouva – pronájem bytu
@@ -322,7 +322,7 @@ export const contractConfig = {
 
   // Šablona předávacího protokolu (HTML)
   handoverProtocolTemplate: `
-<div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; color: #000;">
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.3; color: #000;">
   
   <div style="text-align: center; font-size: 20pt; font-weight: bold; margin: 10px 0;">
     Předávací protokol
