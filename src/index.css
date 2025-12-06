@@ -1,8 +1,11 @@
+/* Google Fonts Import - MUST be first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 :root {
   /* Colors - Premium palette */
   --primary-hue: 220;
   --primary-sat: 85%;
-  
+
   --color-primary-50: hsl(var(--primary-hue), var(--primary-sat), 97%);
   --color-primary-100: hsl(var(--primary-hue), var(--primary-sat), 90%);
   --color-primary-200: hsl(var(--primary-hue), var(--primary-sat), 80%);
@@ -13,27 +16,27 @@
   --color-primary-700: hsl(var(--primary-hue), var(--primary-sat), 40%);
   --color-primary-800: hsl(var(--primary-hue), var(--primary-sat), 30%);
   --color-primary-900: hsl(var(--primary-hue), var(--primary-sat), 20%);
-  
+
   --color-success: hsl(142, 71%, 45%);
   --color-success-light: hsl(142, 71%, 95%);
   --color-warning: hsl(45, 93%, 47%);
   --color-warning-light: hsl(45, 93%, 95%);
   --color-error: hsl(0, 72%, 51%);
   --color-error-light: hsl(0, 72%, 95%);
-  
+
   --color-bg: hsl(210, 20%, 98%);
   --color-surface: hsl(0, 0%, 100%);
   --color-border: hsl(210, 16%, 93%);
   --color-text: hsl(210, 24%, 16%);
   --color-text-secondary: hsl(210, 14%, 50%);
   --color-text-disabled: hsl(210, 10%, 70%);
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  
+
   /* Spacing */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
@@ -42,26 +45,23 @@
   --space-xl: 2rem;
   --space-2xl: 3rem;
   --space-3xl: 4rem;
-  
+
   /* Border radius */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-full: 9999px;
-  
+
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   --font-mono: 'Fira Code', 'Courier New', monospace;
-  
+
   /* Transitions */
   --transition-fast: 150ms ease-in-out;
   --transition-normal: 250ms ease-in-out;
   --transition-slow: 350ms ease-in-out;
 }
-
-/* Google Fonts Import */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Reset & Base */
 * {
@@ -509,28 +509,28 @@ body {
   .app-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .card {
     padding: var(--space-lg);
   }
-  
+
   .progress-steps {
     flex-direction: column;
     gap: var(--space-md);
   }
-  
+
   .progress-steps::before {
     display: none;
   }
-  
+
   .room-variants {
     grid-template-columns: 1fr;
   }
-  
+
   .btn-group {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
   }
@@ -538,6 +538,7 @@ body {
 
 /* Print Styles */
 @media print {
+
   .app-header,
   .app-footer,
   .card,
@@ -546,14 +547,14 @@ body {
   .tabs-list {
     display: none !important;
   }
-  
+
   .preview-container {
     box-shadow: none;
     border: none;
     margin: 0;
     padding: 0;
   }
-  
+
   .preview-content {
     font-family: serif;
     font-size: 12pt;
@@ -566,6 +567,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -587,6 +589,11 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
