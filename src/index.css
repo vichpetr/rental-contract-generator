@@ -482,6 +482,19 @@ body {
   font-size: 11pt;
   line-height: 1.5;
   color: var(--color-text);
+
+  /* A4 page styling */
+  max-width: 793px;
+  /* A4 width at 96 DPI: 21cm = 793px */
+  min-height: 1122px;
+  /* A4 height at 96 DPI: 29.7cm = 1122px */
+  margin: 0 auto;
+  padding: 50px;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  /* Print-friendly page breaks */
+  page-break-inside: avoid;
 }
 
 .preview-content table {

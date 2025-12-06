@@ -73,7 +73,16 @@ function createDocumentDefinitionFromHTML(title, htmlContent) {
             lineHeight: 1.3
         },
         pageSize: 'A4',
-        pageMargins: [50, 50, 50, 50]
+        pageMargins: [50, 50, 50, 60],
+        // Přidána patička s čísly stránek
+        footer: function (currentPage, pageCount) {
+            return {
+                text: `Strana ${currentPage} z ${pageCount}`,
+                alignment: 'center',
+                fontSize: 9,
+                margin: [0, 10, 0, 0]
+            };
+        }
     };
 }
 

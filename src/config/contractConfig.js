@@ -275,20 +275,22 @@ export const contractConfig = {
   <div style="margin: 30px 0 10px 0;">
     <p style="margin-bottom: 30px;">V {{SIGNING_PLACE}} dne {{SIGNING_DATE}}</p>
     
-    <div style="display: flex; justify-content: space-between; margin-top: 40px;">
-      <div style="text-align: center; width: 45%;">
-        <div style="border-top: 1px solid #000; padding-top: 5px;">
-          <p style="margin: 0; font-size: 9pt;">{{LANDLORD_NAME}}</p>
-          <p style="margin: 0; font-size: 9pt;">Pronajímatel</p>
-        </div>
-      </div>
-      <div style="text-align: center; width: 45%;">
-        <div style="border-top: 1px solid #000; padding-top: 5px;">
-          <p style="margin: 0; font-size: 9pt;">{{TENANT_NAME}}</p>
-          <p style="margin: 0; font-size: 9pt;">Nájemce</p>
-        </div>
-      </div>
-    </div>
+    <table style="width: 100%; margin-top: 40px; border-collapse: collapse;">
+      <tr>
+        <td style="width: 50%; text-align: center; vertical-align: top;">
+          <div style="border-top: 1px solid #000; padding-top: 5px; margin: 0 10px;">
+            <p style="margin: 0; font-size: 9pt;">{{LANDLORD_NAME}}</p>
+            <p style="margin: 0; font-size: 9pt;">Pronajímatel</p>
+          </div>
+        </td>
+        <td style="width: 50%; text-align: center; vertical-align: top;">
+          <div style="border-top: 1px solid #000; padding-top: 5px; margin: 0 10px;">
+            <p style="margin: 0; font-size: 9pt;">{{TENANT_NAME}}</p>
+            <p style="margin: 0; font-size: 9pt;">Nájemce</p>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
 
   {{SUBTENANT_SIGNATURE}}
@@ -373,20 +375,22 @@ export const contractConfig = {
   <div style="margin: 30px 0 10px 0;">
     <p style="margin-bottom: 30px;">V {{SIGNING_PLACE}} dne {{SIGNING_DATE}}</p>
     
-    <div style="display: flex; justify-content: space-between; margin-top: 40px;">
-      <div style="text-align: center; width: 45%;">
-        <div style="border-top: 1px solid #000; padding-top: 5px;">
-          <p style="margin: 0; font-size: 9pt;">{{LANDLORD_NAME}}</p>
-          <p style="margin: 0; font-size: 9pt;">Pronajímatel</p>
-        </div>
-      </div>
-      <div style="text-align: center; width: 45%;">
-        <div style="border-top: 1px solid #000; padding-top: 5px;">
-          <p style="margin: 0; font-size: 9pt;">{{TENANT_NAME}}</p>
-          <p style="margin: 0; font-size: 9pt;">Nájemce</p>
-        </div>
-      </div>
-    </div>
+    <table style="width: 100%; margin-top: 40px; border-collapse: collapse;">
+      <tr>
+        <td style="width: 50%; text-align: center; vertical-align: top;">
+          <div style="border-top: 1px solid #000; padding-top: 5px; margin: 0 10px;">
+            <p style="margin: 0; font-size: 9pt;">{{LANDLORD_NAME}}</p>
+            <p style="margin: 0; font-size: 9pt;">Pronajímatel</p>
+          </div>
+        </td>
+        <td style="width: 50%; text-align: center; vertical-align: top;">
+          <div style="border-top: 1px solid #000; padding-top: 5px; margin: 0 10px;">
+            <p style="margin: 0; font-size: 9pt;">{{TENANT_NAME}}</p>
+            <p style="margin: 0; font-size: 9pt;">Nájemce</p>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
 
   {{SUBTENANT_SIGNATURE}}
