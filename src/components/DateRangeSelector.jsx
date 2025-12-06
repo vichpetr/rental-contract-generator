@@ -39,6 +39,13 @@ export default function DateRangeSelector({ dateFrom, dateTo, onChange, errors =
                         className={`form-input ${errors.dateFrom ? 'error' : ''}`}
                         value={dateFrom || ''}
                         onChange={(e) => handleDateFromChange(e.target.value)}
+                        onClick={(e) => {
+                            try {
+                                e.target.showPicker?.();
+                            } catch (err) {
+                                // showPicker not supported in some browsers
+                            }
+                        }}
                     />
                     {errors.dateFrom && (
                         <span className="form-error">{errors.dateFrom}</span>
@@ -55,6 +62,13 @@ export default function DateRangeSelector({ dateFrom, dateTo, onChange, errors =
                         className={`form-input ${errors.dateTo ? 'error' : ''}`}
                         value={dateTo || ''}
                         onChange={(e) => onChange('dateTo', e.target.value)}
+                        onClick={(e) => {
+                            try {
+                                e.target.showPicker?.();
+                            } catch (err) {
+                                // showPicker not supported in some browsers
+                            }
+                        }}
                     />
                     {errors.dateTo && (
                         <span className="form-error">{errors.dateTo}</span>

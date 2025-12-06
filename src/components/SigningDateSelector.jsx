@@ -47,6 +47,13 @@ export default function SigningDateSelector({ signingDate, onChange }) {
                                 className="form-input"
                                 value={signingDate || ''}
                                 onChange={(e) => onChange(e.target.value)}
+                                onClick={(e) => {
+                                    try {
+                                        e.target.showPicker?.();
+                                    } catch (err) {
+                                        // showPicker not supported in some browsers
+                                    }
+                                }}
                             />
                         </>
                     )}
