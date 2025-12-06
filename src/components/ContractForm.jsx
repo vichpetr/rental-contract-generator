@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { contractConfig } from '../config/contractConfig';
-import { validateStep } from '../utils/validation';
+import { validateStep, validatePersonField } from '../utils/validation';
 import { generateBothPDFs, downloadPDF } from '../utils/pdfGenerator';
 import RoomVariantSelector from './RoomVariantSelector';
 import PersonForm from './PersonForm';
@@ -112,17 +112,35 @@ export default function ContractForm() {
         }));
     };
 
-    const updateTenant = (tenant) => {
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            tenant
+    const updateTenant = (newTenant) => {
+        setFormData(prev => ({
+            ...prev,
+            tenant: newTenant
         }));
     };
 
-    const updateSubtenant = (subtenant) => {
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            subtenant
+    // Live validace jednotlivého pole nájemce
+    const handleTenantFieldValidation = (field) => {
+        const fieldError = validatePersonField(formData.tenant, field, true);
+        setErrors(prev => ({
+            ...prev,
+            ...fieldError
+        }));
+    };
+
+    const updateSubtenant = (newSubtenant) => {
+        setFormData(prev => ({
+            ...prev,
+            subtenant: newSubtenant
+        }));
+    };
+
+    // Live validace jednotlivého pole podnájemce
+    const handleSubtenantFieldValidation = (field) => {
+        const fieldError = validatePersonField(formData.subtenant, field, formData.hasSubtenant);
+        setErrors(prev => ({
+            ...prev,
+            ...fieldError
         }));
     };
 
@@ -172,6 +190,7 @@ export default function ContractForm() {
                         title="Údaje hlavního nájemce"
                         person={formData.tenant}
                         onChange={updateTenant}
+                        onValidate={handleTenantFieldValidation}
                         errors={errors}
                     />
                 )}
@@ -196,8 +215,10 @@ export default function ContractForm() {
 
                         {formData.hasSubtenant && (
                             <PersonForm
+                                title="Údaje podnájemce"
                                 person={formData.subtenant}
                                 onChange={updateSubtenant}
+                                onValidate={handleSubtenantFieldValidation}
                                 errors={errors}
                             />
                         )}

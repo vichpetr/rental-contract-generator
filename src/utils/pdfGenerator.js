@@ -1,5 +1,6 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import htmlToPdfmake from 'html-to-pdfmake';
 import { generateContractText, generateHandoverProtocolText } from './contractGenerator';
 
 // Registrace fontů
@@ -10,82 +11,58 @@ if (pdfFonts.pdfMake) {
 }
 
 /**
- * Převede text s odřádkováním na pole paragrafů pro pdfmake
+ * Převede HTML text na pdfmake formát
  */
-function textToParagraphs(text) {
-    return text.split('\n').map(line => {
-        if (line.trim() === '') {
-            return { text: ' ', margin: [0, 2] };
-        }
+function htmlToContent(htmlText) {
+    // Nahradíme \n za <br> aby se zachovaly odřádkování
+    const html = htmlText.replace(/\n/g, '<br />');
 
-        // Detekce nadpisů (VELKÁ PÍSMENA)
-        if (line === line.toUpperCase() && line.trim().length > 0 && !line.includes(':')) {
-            return {
-                text: line,
-                style: 'header',
-                margin: [0, 10, 0, 5]
-            };
+    // Převedeme HTML na pdfmake formát
+    const content = htmlToPdfmake(html, {
+        tableAutoSize: true,
+        defaultStyles: {
+            b: { bold: true },
+            strong: { bold: true },
+            u: { decoration: 'underline' },
+            s: { decoration: 'lineThrough' },
+            em: { italics: true },
+            i: { italics: true },
+            h1: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] },
+            h2: { fontSize: 13, bold: true, margin: [0, 8, 0, 4] },
+            h3: { fontSize: 12, bold: true, margin: [0, 6, 0, 3] },
+            a: { color: 'blue', decoration: 'underline' },
+            li: { margin: [0, 2, 0, 2] }
         }
-
-        // Detekce podnadpisů (začínají římskými číslicemi nebo arabskými)
-        if (/^(I{1,3}|IV|V|VI{0,3}|IX|X|\d+)\.\s/.test(line.trim())) {
-            return {
-                text: line,
-                style: 'subheader',
-                margin: [0, 8, 0, 4]
-            };
-        }
-
-        // Detekce seznamů (začínají číslem+tečkou)
-        if (/^\d+\.\s/.test(line.trim())) {
-            return {
-                text: line,
-                margin: [0, 3, 0, 3]
-            };
-        }
-
-        // Detekce podpisových řádků
-        if (line.includes('___________________________')) {
-            return {
-                text: line,
-                margin: [0, 20, 0, 5]
-            };
-        }
-
-        // Normální text
-        return {
-            text: line,
-            margin: [0, 2, 0, 2]
-        };
     });
+
+    return content;
 }
 
 /**
- * Vytvoří definici PDF dokumentu
+ * Vytvoří definici PDF dokumentu z HTML obsahu
  */
-function createDocumentDefinition(title, content) {
+function createDocumentDefinitionFromHTML(title, htmlContent) {
+    const content = htmlToContent(htmlContent);
+
     return {
         content: [
             {
                 text: title,
                 style: 'title',
-                margin: [0, 0, 0, 20]
+                margin: [0, 0, 0, 15],
+                alignment: 'center'
             },
-            ...textToParagraphs(content)
+            ...Array.isArray(content) ? content : [content]
         ],
         styles: {
             title: {
-                fontSize: 16,
-                bold: true,
-                alignment: 'center'
+                fontSize: 14,
+                bold: true
             },
-            header: {
-                fontSize: 13,
-                bold: true,
-                alignment: 'center'
+            'html-strong': {
+                bold: true
             },
-            subheader: {
-                fontSize: 12,
+            'html-b': {
                 bold: true
             }
         },
@@ -94,7 +71,7 @@ function createDocumentDefinition(title, content) {
             lineHeight: 1.3
         },
         pageSize: 'A4',
-        pageMargins: [60, 60, 60, 60]
+        pageMargins: [50, 50, 50, 50]
     };
 }
 
@@ -103,7 +80,7 @@ function createDocumentDefinition(title, content) {
  */
 export function generateContractPDF(formData) {
     const contractText = generateContractText(formData);
-    const docDefinition = createDocumentDefinition('SMLOUVA O PODNÁJMU BYTU', contractText);
+    const docDefinition = createDocumentDefinitionFromHTML('SMLOUVA O PODNÁJMU POKOJE', contractText);
 
     return pdfMake.createPdf(docDefinition);
 }
@@ -113,7 +90,7 @@ export function generateContractPDF(formData) {
  */
 export function generateHandoverProtocolPDF(formData) {
     const protocolText = generateHandoverProtocolText(formData);
-    const docDefinition = createDocumentDefinition('PŘEDÁVACÍ PROTOKOL', protocolText);
+    const docDefinition = createDocumentDefinitionFromHTML('PŘEDÁVACÍ PROTOKOL', protocolText);
 
     return pdfMake.createPdf(docDefinition);
 }
@@ -125,14 +102,18 @@ export function generateBothPDFs(formData) {
     const contractText = generateContractText(formData);
     const protocolText = generateHandoverProtocolText(formData);
 
+    const contractContent = htmlToContent(contractText);
+    const protocolContent = htmlToContent(protocolText);
+
     const docDefinition = {
         content: [
             {
-                text: 'SMLOUVA O PODNÁJMU BYTU',
+                text: 'SMLOUVA O PODNÁJMU POKOJE',
                 style: 'title',
-                margin: [0, 0, 0, 20]
+                margin: [0, 0, 0, 15],
+                alignment: 'center'
             },
-            ...textToParagraphs(contractText),
+            ...Array.isArray(contractContent) ? contractContent : [contractContent],
             {
                 text: '',
                 pageBreak: 'after'
@@ -140,23 +121,20 @@ export function generateBothPDFs(formData) {
             {
                 text: 'PŘEDÁVACÍ PROTOKOL',
                 style: 'title',
-                margin: [0, 0, 0, 20]
+                margin: [0, 0, 0, 15],
+                alignment: 'center'
             },
-            ...textToParagraphs(protocolText)
+            ...Array.isArray(protocolContent) ? protocolContent : [protocolContent]
         ],
         styles: {
             title: {
-                fontSize: 16,
-                bold: true,
-                alignment: 'center'
+                fontSize: 14,
+                bold: true
             },
-            header: {
-                fontSize: 13,
-                bold: true,
-                alignment: 'center'
+            'html-strong': {
+                bold: true
             },
-            subheader: {
-                fontSize: 12,
+            'html-b': {
                 bold: true
             }
         },
@@ -165,7 +143,7 @@ export function generateBothPDFs(formData) {
             lineHeight: 1.3
         },
         pageSize: 'A4',
-        pageMargins: [60, 60, 60, 60]
+        pageMargins: [50, 50, 50, 50]
     };
 
     return pdfMake.createPdf(docDefinition);

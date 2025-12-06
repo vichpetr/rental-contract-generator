@@ -3,59 +3,23 @@
  */
 
 /**
- * Validuje číslo dokladu (rodné číslo nebo číslo pasu)
- * Formát rodného čísla: RRMMDD/XXXX (před 1954) nebo RRMMDD/XXX (po 1954)
- * Formát pasu: alfanumerický kód (např. AB123456)
+ * Validuje číslo dokladu - pouze povinnost vyplnění
  */
 export function validateBirthNumber(birthNumber) {
-    if (!birthNumber) {
+    if (!birthNumber || !birthNumber.trim()) {
         return 'Číslo dokladu je povinné';
-    }
-
-    const trimmed = birthNumber.trim();
-
-    // Kontrola minimální délky
-    if (trimmed.length < 6) {
-        return 'Číslo dokladu je příliš krátké';
-    }
-
-    // Odstranění mezer a lomítka pro kontrolu rodného čísla
-    const cleaned = birthNumber.replace(/\s/g, '').replace('/', '');
-
-    // Pokud obsahuje pouze číslice, validujeme jako rodné číslo
-    if (/^\d+$/.test(cleaned)) {
-        // Kontrola délky pro rodné číslo
-        if (cleaned.length !== 9 && cleaned.length !== 10) {
-            return 'Rodné číslo musí mít 9 nebo 10 číslic (formát: RRMMDD/XXXX)';
-        }
-
-        // Pro rodná čísla s 10 číslicemi kontrola dělitelnosti 11
-        if (cleaned.length === 10) {
-            const num = parseInt(cleaned, 10);
-            if (num % 11 !== 0) {
-                return 'Rodné číslo není platné (neplatný kontrolní součet)';
-            }
-        }
-    } else {
-        // Pro čísla pasů - kontrola alfanumerického formátu
-        if (!/^[A-Z0-9]+$/i.test(cleaned)) {
-            return 'Číslo pasu může obsahovat pouze písmena a číslice';
-        }
-
-        if (cleaned.length > 20) {
-            return 'Číslo dokladu je příliš dlouhé';
-        }
     }
 
     return null; // Validní
 }
 
 /**
- * Validuje email
+ * Validuje email - volitelný, ale pokud je vyplněný, musí být validní
  */
 export function validateEmail(email) {
-    if (!email) {
-        return 'Email je povinný';
+    // Email je volitelný
+    if (!email || !email.trim()) {
+        return null;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,24 +31,10 @@ export function validateEmail(email) {
 }
 
 /**
- * Validuje telefonní číslo
+ * Validuje telefonní číslo - volitelné
  */
 export function validatePhone(phone) {
-    if (!phone) {
-        return 'Telefon je povinný';
-    }
-
-    // Odstranění mezer a speciálních znaků
-    const cleaned = phone.replace(/\s/g, '').replace(/[+()-]/g, '');
-
-    if (cleaned.length < 9) {
-        return 'Telefonní číslo je příliš krátké';
-    }
-
-    if (!/^\d+$/.test(cleaned)) {
-        return 'Telefonní číslo může obsahovat pouze číslice a speciální znaky (+, -, (, ))';
-    }
-
+    // Telefon je volitelný
     return null;
 }
 
@@ -152,18 +102,71 @@ export function validatePerson(person, isRequired = true) {
         if (addressError) errors.address = addressError;
     }
 
-    if (isRequired || person.phone) {
+    // Telefon je volitelný
+    if (person.phone) {
         const phoneError = validatePhone(person.phone);
         if (phoneError) errors.phone = phoneError;
     }
 
-    if (isRequired || person.email) {
+    // Email je volitelný, ale pokud je vyplněný, musí být validní
+    if (person.email) {
         const emailError = validateEmail(person.email);
         if (emailError) errors.email = emailError;
     }
 
     return Object.keys(errors).length > 0 ? errors : null;
 }
+
+/**
+ * Validuje jednotlivé pole osoby (pro live validaci)
+ */
+export function validatePersonField(person, field, isRequired = true) {
+    const error = {};
+
+    switch (field) {
+        case 'firstName':
+            if (isRequired || person.firstName) {
+                const firstNameError = validateRequired(person.firstName, 'Jméno');
+                if (firstNameError) error.firstName = firstNameError;
+            }
+            break;
+        case 'lastName':
+            if (isRequired || person.lastName) {
+                const lastNameError = validateRequired(person.lastName, 'Příjmení');
+                if (lastNameError) error.lastName = lastNameError;
+            }
+            break;
+        case 'birthNumber':
+            if (isRequired || person.birthNumber) {
+                const birthNumberError = validateBirthNumber(person.birthNumber);
+                if (birthNumberError) error.birthNumber = birthNumberError;
+            }
+            break;
+        case 'address':
+            if (isRequired || person.address) {
+                const addressError = validateRequired(person.address, 'Adresa');
+                if (addressError) error.address = addressError;
+            }
+            break;
+        case 'phone':
+            if (person.phone) {
+                const phoneError = validatePhone(person.phone);
+                if (phoneError) error.phone = phoneError;
+            }
+            break;
+        case 'email':
+            if (person.email) {
+                const emailError = validateEmail(person.email);
+                if (emailError) error.email = emailError;
+            }
+            break;
+        default:
+            break;
+    }
+
+    return error;
+}
+
 
 /**
  * Validuje celý formulář
