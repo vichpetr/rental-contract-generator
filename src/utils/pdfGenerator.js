@@ -46,16 +46,20 @@ function htmlToContent(htmlText) {
 function createDocumentDefinitionFromHTML(title, htmlContent) {
     const content = htmlToContent(htmlContent);
 
+    // Pokud je title prázdný, přidáme jen obsah
+    const contentArray = [];
+    if (title && title.trim()) {
+        contentArray.push({
+            text: title,
+            style: 'title',
+            margin: [0, 0, 0, 15],
+            alignment: 'center'
+        });
+    }
+    contentArray.push(...(Array.isArray(content) ? content : [content]));
+
     return {
-        content: [
-            {
-                text: title,
-                style: 'title',
-                margin: [0, 0, 0, 15],
-                alignment: 'center'
-            },
-            ...Array.isArray(content) ? content : [content]
-        ],
+        content: contentArray,
         styles: {
             title: {
                 fontSize: 14,
@@ -91,7 +95,7 @@ function createDocumentDefinitionFromHTML(title, htmlContent) {
  */
 export function generateContractPDF(formData) {
     const contractText = generateContractText(formData);
-    const docDefinition = createDocumentDefinitionFromHTML('SMLOUVA O PODNÁJMU POKOJE', contractText);
+    const docDefinition = createDocumentDefinitionFromHTML('', contractText);
 
     return pdfMake.createPdf(docDefinition);
 }
@@ -101,7 +105,7 @@ export function generateContractPDF(formData) {
  */
 export function generateHandoverProtocolPDF(formData) {
     const protocolText = generateHandoverProtocolText(formData);
-    const docDefinition = createDocumentDefinitionFromHTML('PŘEDÁVACÍ PROTOKOL', protocolText);
+    const docDefinition = createDocumentDefinitionFromHTML('', protocolText);
 
     return pdfMake.createPdf(docDefinition);
 }
@@ -118,22 +122,10 @@ export function generateBothPDFs(formData) {
 
     const docDefinition = {
         content: [
-            {
-                text: 'SMLOUVA O PODNÁJMU POKOJE',
-                style: 'title',
-                margin: [0, 0, 0, 15],
-                alignment: 'center'
-            },
             ...Array.isArray(contractContent) ? contractContent : [contractContent],
             {
                 text: '',
                 pageBreak: 'after'
-            },
-            {
-                text: 'PŘEDÁVACÍ PROTOKOL',
-                style: 'title',
-                margin: [0, 0, 0, 15],
-                alignment: 'center'
             },
             ...Array.isArray(protocolContent) ? protocolContent : [protocolContent]
         ],
