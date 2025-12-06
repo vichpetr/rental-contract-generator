@@ -1,9 +1,13 @@
 import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { generateContractText, generateHandoverProtocolText } from './contractGenerator';
 
 // Registrace fontů
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+if (pdfFonts.pdfMake) {
+    pdfMake.vfs = pdfFonts.pdfMake.vfs;
+} else {
+    pdfMake.vfs = pdfFonts;
+}
 
 /**
  * Převede text s odřádkováním na pole paragrafů pro pdfmake
