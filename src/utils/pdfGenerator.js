@@ -19,7 +19,6 @@ function htmlToContent(htmlText) {
 
     // Převedeme HTML na pdfmake formát
     const content = htmlToPdfmake(html, {
-        tableAutoSize: true,
         defaultStyles: {
             b: { bold: true },
             strong: { bold: true },
@@ -33,7 +32,7 @@ function htmlToContent(htmlText) {
             a: { color: 'blue', decoration: 'underline' },
             li: { margin: [0, 2, 0, 2] }
         },
-        // Ignorujeme inline styles (včetně font-family)
+        // Ignorujeme inline styles kromě width (který potřebujeme pro tabulky)
         ignoreStyles: ['font-family', 'font-size', 'line-height', 'color']
     });
 

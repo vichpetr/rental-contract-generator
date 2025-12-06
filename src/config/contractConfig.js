@@ -103,28 +103,32 @@ export const contractConfig = {
   contractTemplate: `
 <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; color: #000;">
   
-  <div style="text-align: center; font-size: 14pt; font-weight: bold; margin: 10px 0;">
+  <div style="text-align: center; font-size: 20pt; font-weight: bold; margin: 10px 0;">
     Nájemní smlouva – pronájem bytu
     <p style="text-align: center; font-size: 9pt; margin-bottom: 10px;">
     dle § 2235 a násl. zákona č. 89/2012 Sb., občanského zákoníku, ve znění pozdějších předpisů
   </p>
   </div>
 
-  <div style="border: 2pt solid #000; padding: 10px; margin: 10px 0;">
-    <p style="font-weight: bold; font-size: 10pt; margin: 0 0 8px 0;">1. SMLUVNÍ STRANY</p>
-    
-    <div style="margin-bottom: 8px;">
-      <p style="margin: 2px 0; font-size: 9pt;"><strong>Pronajímatel:</strong> {{LANDLORD_NAME}}, narozen(a) {{LANDLORD_BIRTH_NUMBER}}</p>
-      <p style="margin: 2px 0; font-size: 9pt;">Trvale bytem: {{LANDLORD_ADDRESS}}</p>
-      <p style="margin: 2px 0; font-size: 9pt;">Telefon: {{LANDLORD_PHONE}}, e-mail: {{LANDLORD_EMAIL}}</p>
-    </div>
-
-    <div>
-      <p style="margin: 2px 0; font-size: 9pt;"><strong>Nájemce:</strong> {{TENANT_NAME}}, narozen(a) {{TENANT_BIRTH_NUMBER}}, číslo dokladu: {{TENANT_BIRTH_NUMBER}}</p>
-      <p style="margin: 2px 0; font-size: 9pt;">Trvale bytem: {{TENANT_ADDRESS}}</p>
-      <p style="margin: 2px 0; font-size: 9pt;">Telefon: {{TENANT_PHONE}}, e-mail: {{TENANT_EMAIL}}</p>
-    </div>
-  </div>
+  <table cellspacing="0" cellpadding="3" style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt;">
+    <tr>
+      <td colspan="2" style="border-bottom: 1pt solid #000; padding: 5px; font-weight: bold; font-size: 10pt;">
+        1. SMLUVNÍ STRANY
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 20%; padding: 3px 5px; vertical-align: top;"><strong>Pronajímatel:</strong></td>
+      <td style="padding: 3px 5px;">{{LANDLORD_NAME}}, narozen(a) {{LANDLORD_BIRTH_NUMBER}}<br>
+      Trvale bytem: {{LANDLORD_ADDRESS}}<br>
+      Telefon: {{LANDLORD_PHONE}}, e-mail: {{LANDLORD_EMAIL}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 3px 5px; vertical-align: top;"><strong>Nájemce:</strong></td>
+      <td style="padding: 3px 5px;">{{TENANT_NAME}}, narozen(a) {{TENANT_BIRTH_NUMBER}}, číslo dokladu: {{TENANT_BIRTH_NUMBER}}<br>
+      Trvale bytem: {{TENANT_ADDRESS}}<br>
+      Telefon: {{TENANT_PHONE}}, e-mail: {{TENANT_EMAIL}}</td>
+    </tr>
+  </table>
 
   {{SUBTENANT_SECTION}}
 
@@ -299,9 +303,14 @@ export const contractConfig = {
 
   // Šablona pro sekci podnájemníka (HTML) - zjednodušená
   subtenantSection: `
-  <div style="border: 2pt solid #000; padding: 10px; margin: 10px 0;">
-    <p style="margin: 0; font-size: 9pt;"><strong>Podnájemce:</strong> {{SUBTENANT_NAME}}, narozen(a) {{SUBTENANT_BIRTH_NUMBER}}, {{SUBTENANT_ADDRESS}}, tel.: {{SUBTENANT_PHONE}}, email: {{SUBTENANT_EMAIL}}</p>
-  </div>
+  <table cellspacing="0" cellpadding="3" style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt;">
+    <tr>
+      <td style="width: 20%; padding: 3px 5px; vertical-align: top;"><strong>Podnájemce:</strong></td>
+      <td style="padding: 3px 5px;">{{SUBTENANT_NAME}}, narozen(a) {{SUBTENANT_BIRTH_NUMBER}}<br>
+      {{SUBTENANT_ADDRESS}}<br>
+      Tel.: {{SUBTENANT_PHONE}}, email: {{SUBTENANT_EMAIL}}</td>
+    </tr>
+  </table>
   `,
 
   subtenantSignature: `
@@ -317,19 +326,28 @@ export const contractConfig = {
   handoverProtocolTemplate: `
 <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; color: #000;">
   
-  <div style="text-align: center; font-size: 14pt; font-weight: bold; margin: 10px 0;">
+  <div style="text-align: center; font-size: 20pt; font-weight: bold; margin: 10px 0;">
     Předávací protokol
     <p style="text-align: center; font-size: 10pt; margin: 5px 0;">
       k nájemní smlouvě uzavřené dne {{SIGNING_DATE}}
     </p>
   </div>
 
-  <div style="border: 2pt solid #000; padding: 10px; margin: 10px 0;">
-    <p style="margin: 2px 0; font-size: 9pt;"><strong>Pronajímatel:</strong> {{LANDLORD_NAME}}</p>
-    <p style="margin: 2px 0; font-size: 9pt;"><strong>Nájemce:</strong> {{TENANT_NAME}}</p>
+  <table cellspacing="0" cellpadding="3" style="width: 100%; border: 2pt solid #000; border-collapse: collapse; margin: 10px 0; font-size: 9pt;">
+    <tr>
+      <td style="width: 20%; padding: 3px 5px;"><strong>Pronajímatel:</strong></td>
+      <td style="padding: 3px 5px;">{{LANDLORD_NAME}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 3px 5px;"><strong>Nájemce:</strong></td>
+      <td style="padding: 3px 5px;">{{TENANT_NAME}}</td>
+    </tr>
     {{SUBTENANT_PROTOCOL_SECTION}}
-    <p style="margin: 2px 0; font-size: 9pt;"><strong>Předmět nájmu:</strong> {{ROOM_NAME}}, {{PROPERTY_ADDRESS}}</p>
-  </div>
+    <tr>
+      <td style="padding: 3px 5px;"><strong>Předmět nájmu:</strong></td>
+      <td style="padding: 3px 5px;">{{ROOM_NAME}}, {{PROPERTY_ADDRESS}}</td>
+    </tr>
+  </table>
 
   <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">I. STAV POKOJE PŘI PŘEDÁNÍ</p>
   <p style="margin: 0 0 10px 0; font-size: 9pt;">Pokoj je předáván v řádném stavu, čistý a funkční.</p>
@@ -397,5 +415,8 @@ export const contractConfig = {
 
 </div>`,
 
-  subtenantProtocolSection: `<p style="margin: 2px 0; font-size: 9pt;"><strong>Podnájemce:</strong> {{SUBTENANT_NAME}}</p>`
+  subtenantProtocolSection: `<tr>
+      <td style="padding: 3px 5px;"><strong>Podnájemce:</strong></td>
+      <td style="padding: 3px 5px;">{{SUBTENANT_NAME}}</td>
+    </tr>`
 };
