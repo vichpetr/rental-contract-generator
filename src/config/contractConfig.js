@@ -103,15 +103,15 @@ export const contractConfig = {
   contractTemplate: `
 <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; color: #000;">
   
-  <p style="text-align: center; font-size: 14pt; font-weight: bold; margin: 20px 0;">
+  <p style="text-align: center; font-size: 14pt; font-weight: bold; margin: 10px 0;">
     Nájemní smlouva – pronájem bytu
   </p>
   
-  <p style="text-align: center; font-size: 9pt; margin-bottom: 20px;">
+  <p style="text-align: center; font-size: 9pt; margin-bottom: 10px;">
     dle § 2235 a násl. zákona č. 89/2012 Sb., občanského zákoníku, ve znění pozdějších předpisů
   </p>
 
-  <table cellspacing="0" cellpadding="5" style="width: 100%; border: 2pt solid #000; border-collapse: collapse; margin: 20px 0; font-size: 10pt;">
+  <table cellspacing="0" cellpadding="5" style="width: 100%; border: 2pt solid #000; border-collapse: collapse; margin: 10px 0; font-size: 10pt;">
     <tr>
       <td colspan="2" style="border-bottom: 1pt solid #000; padding: 7px 5px; font-weight: bold; font-size: 10pt;">
         1. SMLUVNÍ STRANY
@@ -218,77 +218,77 @@ export const contractConfig = {
     </tr>
   </table>
 
-  <p style="text-align: center; font-weight: bold; margin: 20px 0 10px 0; font-size: 10pt;">Úvod</p>
+  <p style="text-align: center; font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">Úvod</p>
 
-  <ol style="margin-left: 20px; font-size: 9pt;">
-    <li style="margin-bottom: 10px;">První strana této smlouvy je členěna do částí oddělených očíslovanými nadpisy, které jsou v následujícím textu značeny jako „oddíly".</li>
-    <li style="margin-bottom: 10px;">Tuto nájemní smlouvu uzavřeli dle vlastního prohlášení svéprávní účastníci (dále jen smluvní strany) uvedení na první straně této smlouvy v oddílu „1. SMLUVNÍ STRANY".</li>
+  <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
+    <li style="margin-bottom: 5px;">První strana této smlouvy je členěna do částí oddělených očíslovanými nadpisy, které jsou v následujícím textu značeny jako „oddíly".</li>
+    <li style="margin-bottom: 5px;">Tuto nájemní smlouvu uzavřeli dle vlastního prohlášení svéprávní účastníci (dále jen smluvní strany) uvedení na první straně této smlouvy v oddílu „1. SMLUVNÍ STRANY".</li>
   </ol>
 
-  <p style="text-align: center; font-weight: bold; margin: 15px 0 5px 0; font-size: 10pt;">Článek I.<br>Předmět nájmu</p>
+  <p style="text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek I.<br>Předmět nájmu</p>
 
-  <ol style="margin-left: 20px; font-size: 9pt;">
-    <li style="margin-bottom: 10px;">Pronajímatel je dle výpisu z katastru nemovitostí vedeného příslušným katastrálním úřadem vlastníkem nemovitosti specifikované v položce „Adresa nemovitosti" (dále jen „nemovitost").</li>
-    <li style="margin-bottom: 10px;">Pronajímatel přenechává nájemci nemovitost k zajištění svých bytových potřeb na dobu uvedenou v položce „Doba nájmu", a to od data viz položka „Datum začátku nájmu" do data viz položka „Datum konce nájmu". Pronajímatel souhlasí s tím, že v případě nájmu na dobu určitou a řádného plnění povinností nájemce se na žádost nájemce doba nájmu prodlouží automaticky. Dokladem o prodloužení je písemné potvrzení pronajímatele.</li>
-    <li style="margin-bottom: 10px;">Smluvní strany výslovně prohlašují, že nemovitost je způsobilá k řádnému užívání (nastěhování a obývání), a že nic nebrání k plnění této smlouvy nastěhováním nájemce. Smluvní strany se dohodly, že o předání nemovitosti bude vyhotoven předávací protokol, který bude jako příloha č. 1 přiložen k této smlouvě.</li>
+  <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
+    <li style="margin-bottom: 5px;">Pronajímatel je dle výpisu z katastru nemovitostí vedeného příslušným katastrálním úřadem vlastníkem nemovitosti specifikované v položce „Adresa nemovitosti" (dále jen „nemovitost").</li>
+    <li style="margin-bottom: 5px;">Pronajímatel přenechává nájemci nemovitost k zajištění svých bytových potřeb na dobu uvedenou v položce „Doba nájmu", a to od data viz položka „Datum začátku nájmu" do data viz položka „Datum konce nájmu". Pronajímatel souhlasí s tím, že v případě nájmu na dobu určitou a řádného plnění povinností nájemce se na žádost nájemce doba nájmu prodlouží automaticky. Dokladem o prodloužení je písemné potvrzení pronajímatele.</li>
+    <li style="margin-bottom: 5px;">Smluvní strany výslovně prohlašují, že nemovitost je způsobilá k řádnému užívání (nastěhování a obývání), a že nic nebrání k plnění této smlouvy nastěhováním nájemce. Smluvní strany se dohodly, že o předání nemovitosti bude vyhotoven předávací protokol, který bude jako příloha č. 1 přiložen k této smlouvě.</li>
   </ol>
 
-  <p style="text-align: center; font-weight: bold; margin: 15px 0 5px 0; font-size: 10pt;">Článek II.<br>Nájem a jeho užívání</p>
+  <p style="text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek II.<br>Nájem a jeho užívání</p>
 
-  <ol style="margin-left: 20px; font-size: 9pt;">
-    <li style="margin-bottom: 10px;"><strong>Společné prostory:</strong> Nájemce může užívat společné prostory domu (tedy chodbičku, koupelnu, kuchyni, toaletu a předsíň), a to pouze ke sjednanému účelu, tj. k bydlení, a je povinen se o společné prostory starat.</li>
-    <li style="margin-bottom: 10px;">Nájemce nemá nárok na výlučné užívání koupelny či kuchyně. Je povinen se chovat ohleduplně k dalším obyvatelům.</li>
-    <li style="margin-bottom: 10px;">V nemovitosti je zakázáno držení domácích mazlíčků a kouření. Porušení zákazu je hrubým porušením povinností nájemce.</li>
-    <li style="margin-bottom: 10px;">Pronajímatel má právo v případě nutnosti vstoupit do nemovitosti bez souhlasu nájemce. Dále má právo za přiměřeného předchozího upozornění vstoupit do nemovitosti v doprovodu dalších osob.</li>
-    <li style="margin-bottom: 10px;">Drobné opravy nemovitosti související s jejím užíváním a náklady spojené s běžnou údržbou (do 1000 Kč) hradí nájemce.</li>
-    <li style="margin-bottom: 10px;">Změny na nemovitosti, včetně stavebních úprav, je nájemce oprávněn provádět jen s písemným souhlasem pronajímatele.</li>
+  <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
+    <li style="margin-bottom: 5px;"><strong>Společné prostory:</strong> Nájemce může užívat společné prostory domu (tedy chodbičku, koupelnu, kuchyni, toaletu a předsíň), a to pouze ke sjednanému účelu, tj. k bydlení, a je povinen se o společné prostory starat.</li>
+    <li style="margin-bottom: 5px;">Nájemce nemá nárok na výlučné užívání koupelny či kuchyně. Je povinen se chovat ohleduplně k dalším obyvatelům.</li>
+    <li style="margin-bottom: 5px;">V nemovitosti je zakázáno držení domácích mazlíčků a kouření. Porušení zákazu je hrubým porušením povinností nájemce.</li>
+    <li style="margin-bottom: 5px;">Pronajímatel má právo v případě nutnosti vstoupit do nemovitosti bez souhlasu nájemce. Dále má právo za přiměřeného předchozího upozornění vstoupit do nemovitosti v doprovodu dalších osob.</li>
+    <li style="margin-bottom: 5px;">Drobné opravy nemovitosti související s jejím užíváním a náklady spojené s běžnou údržbou (do 1000 Kč) hradí nájemce.</li>
+    <li style="margin-bottom: 5px;">Změny na nemovitosti, včetně stavebních úprav, je nájemce oprávněn provádět jen s písemným souhlasem pronajímatele.</li>
   </ol>
 
-  <p style="text-align: center; font-weight: bold; margin: 15px 0 5px 0; font-size: 10pt;">Článek III.<br>Nájemné a placení</p>
+  <p style="text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek III.<br>Nájemné a placení</p>
 
-  <ol style="margin-left: 20px; font-size: 9pt;">
-    <li style="margin-bottom: 10px;">Nájemce se zavazuje platit pronajímateli za pronájem nemovitosti nájemné ve výši stanovené v položce „Výše čistého nájemného".</li>
-    <li style="margin-bottom: 10px;">Splatnost nájemného: Nájemné je splatné k datu uvedenému v položce „Splatnost nájmu" daného měsíce, a to předem.</li>
-    <li style="margin-bottom: 10px;">Způsob placení nájemného: Platby se uskutečňují převodem na bankovní účet uvedený v položce „Číslo účtu pronajímatele".</li>
-    <li style="margin-bottom: 10px;">Kromě nájemného se nájemce zavazuje hradit zálohy na služby spojené s užíváním nemovitosti.</li>
+  <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
+    <li style="margin-bottom: 5px;">Nájemce se zavazuje platit pronajímateli za pronájem nemovitosti nájemné ve výši stanovené v položce „Výše čistého nájemného".</li>
+    <li style="margin-bottom: 5px;">Splatnost nájemného: Nájemné je splatné k datu uvedenému v položce „Splatnost nájmu" daného měsíce, a to předem.</li>
+    <li style="margin-bottom: 5px;">Způsob placení nájemného: Platby se uskutečňují převodem na bankovní účet uvedený v položce „Číslo účtu pronajímatele".</li>
+    <li style="margin-bottom: 5px;">Kromě nájemného se nájemce zavazuje hradit zálohy na služby spojené s užíváním nemovitosti.</li>
   </ol>
 
-  <p style="text-align: center; font-weight: bold; margin: 15px 0 5px 0; font-size: 10pt;">Článek IV.<br>Práva a povinnosti stran</p>
+  <p style="text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek IV.<br>Práva a povinnosti stran</p>
 
-  <ol style="margin-left: 20px; font-size: 9pt;">
-    <li style="margin-bottom: 10px;">Nájemce je povinen užívat nemovitost řádně a v souladu s povahou nemovitosti.</li>
-    <li style="margin-bottom: 10px;">Nájemce je povinen dodržovat domovní řád a ustanovení občanského zákoníku.</li>
-    <li style="margin-bottom: 10px;">Po celou dobu trvání nájmu je nájemce povinen udržovat nemovitost včetně vybavení ve stavu odpovídajícímu řádnému užívání.</li>
+  <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
+    <li style="margin-bottom: 5px;">Nájemce je povinen užívat nemovitost řádně a v souladu s povahou nemovitosti.</li>
+    <li style="margin-bottom: 5px;">Nájemce je povinen dodržovat domovní řád a ustanovení občanského zákoníku.</li>
+    <li style="margin-bottom: 5px;">Po celou dobu trvání nájmu je nájemce povinen udržovat nemovitost včetně vybavení ve stavu odpovídajícímu řádnému užívání.</li>
   </ol>
 
-  <p style="text-align: center; font-weight: bold; margin: 15px 0 5px 0; font-size: 10pt;">Článek V.<br>Skončení nájmu</p>
+  <p style="text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek V.<br>Skončení nájmu</p>
 
-  <ol style="margin-left: 20px; font-size: 9pt;">
-    <li style="margin-bottom: 10px;">Nájem nemovitosti na základě této smlouvy je sjednán na dobu uvedenou v položce „Doba nájmu".</li>
-    <li style="margin-bottom: 10px;">Nájem zanikne písemnou dohodou mezi pronajímatelem a nájemcem. Výpověď je možné poslat emailem.</li>
-    <li style="margin-bottom: 10px;">Pro případ výpovědi se sjednává {{NOTICE_PERIOD}}-měsíční výpovědní doba.</li>
+  <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
+    <li style="margin-bottom: 5px;">Nájem nemovitosti na základě této smlouvy je sjednán na dobu uvedenou v položce „Doba nájmu".</li>
+    <li style="margin-bottom: 5px;">Nájem zanikne písemnou dohodou mezi pronajímatelem a nájemcem. Výpověď je možné poslat emailem.</li>
+    <li style="margin-bottom: 5px;">Pro případ výpovědi se sjednává {{NOTICE_PERIOD}}-měsíční výpovědní doba.</li>
   </ol>
 
-  <p style="text-align: center; font-weight: bold; margin: 15px 0 5px 0; font-size: 10pt;">Článek VI.<br>Doručování</p>
+  <p style="text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek VI.<br>Doručování</p>
 
-  <ol style="margin-left: 20px; font-size: 9pt;">
-    <li style="margin-bottom: 10px;">Nájemce je povinen doručovat pronajímateli písemnosti na adresu uvedenou v záhlaví této smlouvy.</li>
-    <li style="margin-bottom: 10px;">Pronajímatel je povinen doručovat nájemci písemnosti na adresu budovy nebo na adresu bydliště.</li>
+  <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
+    <li style="margin-bottom: 5px;">Nájemce je povinen doručovat pronajímateli písemnosti na adresu uvedenou v záhlaví této smlouvy.</li>
+    <li style="margin-bottom: 5px;">Pronajímatel je povinen doručovat nájemci písemnosti na adresu budovy nebo na adresu bydliště.</li>
   </ol>
 
-  <p style="text-align: center; font-weight: bold; margin: 15px 0 5px 0; font-size: 10pt;">Článek VII.<br>Závěrečná ustanovení</p>
+  <p style="text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek VII.<br>Závěrečná ustanovení</p>
 
-  <ol style="margin-left: 20px; font-size: 9pt;">
-    <li style="margin-bottom: 10px;">Tato smlouva nabývá platnosti a účinnosti dnem podpisu smluvních stran.</li>
-    <li style="margin-bottom: 10px;">Smluvní strany se dohodly, že v náležitostech touto smlouvou přímo neupravených se jejich vzájemné vztahy budou řídit příslušnými ustanoveními občanského zákoníku.</li>
-    <li style="margin-bottom: 10px;">Tato smlouva se vyhotovuje ve {{COPIES_COUNT}} stejnopisech s platností originálu, po {{COPIES_PER_PARTY}} výtisku pro každou ze smluvních stran.</li>
-    <li style="margin-bottom: 10px;">Přílohou této smlouvy je Předávací protokol (Příloha č. 1).</li>
-    <li style="margin-bottom: 10px;">Smluvní strany prohlašují, že před podpisem tuto smlouvu řádně projednaly a přečetly, že je sepsána podle jejich pravé a svobodné vůle.</li>
+  <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
+    <li style="margin-bottom: 5px;">Tato smlouva nabývá platnosti a účinnosti dnem podpisu smluvních stran.</li>
+    <li style="margin-bottom: 5px;">Smluvní strany se dohodly, že v náležitostech touto smlouvou přímo neupravených se jejich vzájemné vztahy budou řídit příslušnými ustanoveními občanského zákoníku.</li>
+    <li style="margin-bottom: 5px;">Tato smlouva se vyhotovuje ve {{COPIES_COUNT}} stejnopisech s platností originálu, po {{COPIES_PER_PARTY}} výtisku pro každou ze smluvních stran.</li>
+    <li style="margin-bottom: 5px;">Přílohou této smlouvy je Předávací protokol (Příloha č. 1).</li>
+    <li style="margin-bottom: 5px;">Smluvní strany prohlašují, že před podpisem tuto smlouvu řádně projednaly a přečetly, že je sepsána podle jejich pravé a svobodné vůle.</li>
   </ol>
 
-  <p style="margin: 40px 0 20px 0;">V {{SIGNING_PLACE}} dne {{SIGNING_DATE}}</p>
+  <p style="margin: 20px 0 10px 0;">V {{SIGNING_PLACE}} dne {{SIGNING_DATE}}</p>
 
-  <table style="width: 100%; margin-top: 40px;">
+  <table style="width: 100%; margin-top: 20px;">
     <tr>
       <td style="width: 50%; text-align: center; border-top: 1px solid #000; padding-top: 5px;">Podpis pronajímatele</td>
       <td style="width: 50%; text-align: center; border-top: 1px solid #000; padding-top: 5px;">Podpis nájemce</td>
