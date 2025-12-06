@@ -119,6 +119,16 @@ export function formatContractData(formData) {
         PERSON_WORD: getPersonWord(numberOfOccupants),
         BANK_ACCOUNT: formatBankAccount(contractConfig.landlord.bankAccount),
         SECURITY_DEPOSIT: contractConfig.securityDeposit.amount.toLocaleString('cs-CZ'),
+        RENT_DUE_DAY: contractConfig.rentDueDay,
+
+        // Rozpad služeb
+        SERVICE_GAS: contractConfig.servicesBreakdown.gas.toLocaleString('cs-CZ'),
+        SERVICE_ELECTRICITY: contractConfig.servicesBreakdown.electricity.toLocaleString('cs-CZ'),
+        SERVICE_WATER: contractConfig.servicesBreakdown.coldWater.toLocaleString('cs-CZ'),
+        SERVICE_BUILDING: contractConfig.servicesBreakdown.buildingServices.toLocaleString('cs-CZ'),
+
+        // Ostatní
+        NOTICE_PERIOD: contractConfig.noticePeriodMonths,
 
         // Podpis
         SIGNING_PLACE: contractConfig.property.city,
