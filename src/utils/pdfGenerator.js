@@ -9,7 +9,7 @@ const defaultOptions = {
     filename: 'smlouva.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         letterRendering: true,
         allowTaint: false,
@@ -123,23 +123,101 @@ export function generateBothPDFs(formData) {
             return html2pdf()
                 .set(customOpt)
                 .from(createTempElement(combinedHTML))
-                .save()
-                .then(() => removeTempElement(tempDiv));
+                .toPdf()
+                .get('pdf')
+                .then((pdf) => {
+                    // Přidat čísla stránek
+                    const totalPages = pdf.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.setPage(i);
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(100);
+                        // Přidat číslo stránky na střed spodního okraje
+                        pdf.text(
+                            `Strana ${i} z ${totalPages}`,
+                            pdf.internal.pageSize.getWidth() / 2,
+                            pdf.internal.pageSize.getHeight() - 10,
+                            { align: 'center' }
+                        );
+                    }
+                    pdf.save(filename);
+                    removeTempElement(tempDiv);
+                });
         },
         save: () => {
-            return worker.save().then(() => removeTempElement(tempDiv));
+            return html2pdf()
+                .set(opt)
+                .from(createTempElement(combinedHTML))
+                .toPdf()
+                .get('pdf')
+                .then((pdf) => {
+                    // Přidat čísla stránek
+                    const totalPages = pdf.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.setPage(i);
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(100);
+                        pdf.text(
+                            `Strana ${i} z ${totalPages}`,
+                            pdf.internal.pageSize.getWidth() / 2,
+                            pdf.internal.pageSize.getHeight() - 10,
+                            { align: 'center' }
+                        );
+                    }
+                    pdf.save(opt.filename);
+                    removeTempElement(tempDiv);
+                });
         },
         open: () => {
-            return worker.outputPdf('bloburl').then((url) => {
-                removeTempElement(tempDiv);
-                window.open(url, '_blank');
-            });
+            return html2pdf()
+                .set(opt)
+                .from(createTempElement(combinedHTML))
+                .toPdf()
+                .get('pdf')
+                .then((pdf) => {
+                    // Přidat čísla stránek
+                    const totalPages = pdf.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.setPage(i);
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(100);
+                        pdf.text(
+                            `Strana ${i} z ${totalPages}`,
+                            pdf.internal.pageSize.getWidth() / 2,
+                            pdf.internal.pageSize.getHeight() - 10,
+                            { align: 'center' }
+                        );
+                    }
+                    removeTempElement(tempDiv);
+                    return pdf.output('bloburl');
+                })
+                .then((url) => {
+                    window.open(url, '_blank');
+                });
         },
         getDataUrl: () => {
-            return worker.outputPdf('dataurlstring').then((dataUrl) => {
-                removeTempElement(tempDiv);
-                return dataUrl;
-            });
+            return html2pdf()
+                .set(opt)
+                .from(createTempElement(combinedHTML))
+                .toPdf()
+                .get('pdf')
+                .then((pdf) => {
+                    // Přidat čísla stránek
+                    const totalPages = pdf.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.setPage(i);
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(100);
+                        pdf.text(
+                            `Strana ${i} z ${totalPages}`,
+                            pdf.internal.pageSize.getWidth() / 2,
+                            pdf.internal.pageSize.getHeight() - 10,
+                            { align: 'center' }
+                        );
+                    }
+                    removeTempElement(tempDiv);
+                    return pdf.output('dataurlstring');
+                });
         }
     };
 }
