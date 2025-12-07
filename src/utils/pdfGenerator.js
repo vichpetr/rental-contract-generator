@@ -39,6 +39,10 @@ function createTempElement(htmlContent) {
     tempDiv.style.padding = '0';
     tempDiv.style.margin = '0';
     tempDiv.style.boxSizing = 'border-box';
+
+    // Skrýt na obrazovce, ale zobrazit pro PDF rendering
+    tempDiv.classList.add('hide-for-screen');
+
     tempDiv.innerHTML = htmlContent;
     document.body.appendChild(tempDiv);
     return tempDiv;
@@ -94,35 +98,29 @@ export function generateHandoverProtocolPDF(formData) {
 }
 
 /**
- * Vygeneruje oba dokumenty v jednom PDF
+ * Vygeneruje oba dokumenty v jednom PDF přímo z viditelného náhledu
  */
 export function generateBothPDFs(formData) {
-    const contractText = generateContractText(formData);
-    const protocolText = generateHandoverProtocolText(formData);
-
-    // Spojit oba dokumenty s page break mezi nimi
-    const combinedHTML = `
-        ${contractText}
-        <div style="page-break-after: always;"></div>
-        ${protocolText}
-    `;
-
-    const tempDiv = createTempElement(combinedHTML);
-
     const opt = {
         ...defaultOptions,
         filename: `smlouva-${new Date().toISOString().split('T')[0]}.pdf`
     };
 
-    const worker = html2pdf().set(opt).from(tempDiv);
-
     // Vrátit objekt s metodami pro kompatibilitu
     return {
         download: (filename) => {
             const customOpt = { ...opt, filename };
+
+            // Najít viditelný preview element
+            const previewContent = document.querySelector('.preview-content');
+            if (!previewContent) {
+                console.error('Preview content not found');
+                return Promise.reject('Preview content not found');
+            }
+
             return html2pdf()
                 .set(customOpt)
-                .from(createTempElement(combinedHTML))
+                .from(previewContent)
                 .toPdf()
                 .get('pdf')
                 .then((pdf) => {
@@ -132,7 +130,6 @@ export function generateBothPDFs(formData) {
                         pdf.setPage(i);
                         pdf.setFontSize(9);
                         pdf.setTextColor(100);
-                        // Přidat číslo stránky na střed spodního okraje
                         pdf.text(
                             `Strana ${i} z ${totalPages}`,
                             pdf.internal.pageSize.getWidth() / 2,
@@ -141,13 +138,18 @@ export function generateBothPDFs(formData) {
                         );
                     }
                     pdf.save(filename);
-                    removeTempElement(tempDiv);
                 });
         },
         save: () => {
+            const previewContent = document.querySelector('.preview-content');
+            if (!previewContent) {
+                console.error('Preview content not found');
+                return Promise.reject('Preview content not found');
+            }
+
             return html2pdf()
                 .set(opt)
-                .from(createTempElement(combinedHTML))
+                .from(previewContent)
                 .toPdf()
                 .get('pdf')
                 .then((pdf) => {
@@ -165,13 +167,18 @@ export function generateBothPDFs(formData) {
                         );
                     }
                     pdf.save(opt.filename);
-                    removeTempElement(tempDiv);
                 });
         },
         open: () => {
+            const previewContent = document.querySelector('.preview-content');
+            if (!previewContent) {
+                console.error('Preview content not found');
+                return Promise.reject('Preview content not found');
+            }
+
             return html2pdf()
                 .set(opt)
-                .from(createTempElement(combinedHTML))
+                .from(previewContent)
                 .toPdf()
                 .get('pdf')
                 .then((pdf) => {
@@ -188,7 +195,6 @@ export function generateBothPDFs(formData) {
                             { align: 'center' }
                         );
                     }
-                    removeTempElement(tempDiv);
                     return pdf.output('bloburl');
                 })
                 .then((url) => {
@@ -196,9 +202,15 @@ export function generateBothPDFs(formData) {
                 });
         },
         getDataUrl: () => {
+            const previewContent = document.querySelector('.preview-content');
+            if (!previewContent) {
+                console.error('Preview content not found');
+                return Promise.reject('Preview content not found');
+            }
+
             return html2pdf()
                 .set(opt)
-                .from(createTempElement(combinedHTML))
+                .from(previewContent)
                 .toPdf()
                 .get('pdf')
                 .then((pdf) => {
@@ -215,7 +227,6 @@ export function generateBothPDFs(formData) {
                             { align: 'center' }
                         );
                     }
-                    removeTempElement(tempDiv);
                     return pdf.output('dataurlstring');
                 });
         }

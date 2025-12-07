@@ -1,12 +1,9 @@
-import { useState } from 'react';
 import { generateContractText, generateHandoverProtocolText } from '../utils/contractGenerator';
 
 /**
  * Komponenta pro náhled výsledných dokumentů
  */
 export default function ContractPreview({ formData }) {
-    const [activeTab, setActiveTab] = useState('contract');
-
     const contractText = generateContractText(formData);
     const protocolText = generateHandoverProtocolText(formData);
 
@@ -17,30 +14,17 @@ export default function ContractPreview({ formData }) {
                 Zkontrolujte správnost údajů před vytvořením PDF
             </p>
 
-            <div className="tabs">
-                <div className="tabs-list">
-                    <button
-                        className={`tab ${activeTab === 'contract' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('contract')}
-                    >
-                        Nájemní smlouva
-                    </button>
-                    <button
-                        className={`tab ${activeTab === 'protocol' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('protocol')}
-                    >
-                        Předávací protokol
-                    </button>
-                </div>
-
-                <div className="preview-container">
-                    <div
-                        className="preview-content"
-                        dangerouslySetInnerHTML={{
-                            __html: activeTab === 'contract' ? contractText : protocolText
-                        }}
-                    />
-                </div>
+            <div className="preview-container">
+                <div
+                    className="preview-content"
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            ${contractText}
+                            <div style="page-break-after: always;"></div>
+                            ${protocolText}
+                        `
+                    }}
+                />
             </div>
         </div>
     );
