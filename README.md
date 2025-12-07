@@ -1,131 +1,60 @@
-# Generátor nájemních smluv
+# Generátor nájemních smluv (Module Federation Remote)
 
-Webová aplikace pro generování nájemních smluv a předávacích protokolů pro podnájem pokojů.
+Tento projekt slouží jako **modul** (Remote Application) pro hlavní portálovou aplikaci.
+Lze jej spouštět i samostatně pro vývoj.
 
-## 📋 Funkce (Fáze 1 - MVP)
+## 🚀 Rychlý Start
+
+Pro spuštění v rámci portálové aplikace je potřeba, aby běžel na portu **5001** v režimu, který vystavuje `remoteEntry.js`.
+
+```bash
+npm install
+npm run build
+npm run serve
+```
+Aplikace poběží na `http://localhost:5001` a bude připravena pro napojení do Shell aplikace.
+
+---
+
+## 🏗 Architektura
+
+Tato aplikace je součástí modulárního systému (Micro-frontends) postaveného na **Vite Module Federation**.
+
+- **Jméno modulu**: `rental_generator`
+- **Exponované komponenty**: `./App` (vstupní bod aplikace)
+- **Shared dependencies**: `react`, `react-dom`
+
+### Jak to funguje?
+Aplikace se vybuildí do statických souborů, kde vznikne `dist/assets/remoteEntry.js`. Tento soubor si stahuje hlavní aplikace (Portal) a dynamicky načítá komponenty z tohoto projektu.
+
+## 💻 Vývoj
+
+### Samostatný vývoj (Standalone)
+Pro běžný vývoj (úpravy formuláře, logiky):
+```bash
+npm run dev
+```
+Aplikace poběží na `http://localhost:5173`.
+
+### Integrační vývoj (s Portálem)
+Pokud potřebujete testovat propojení s portálem:
+1. Spusťte tento projekt: `npm run build && npm run serve`
+2. Spusťte `portal-app` vedle v druhém terminálu.
+
+## 📋 Funkce (MVP)
 
 - ✅ Výběr varianty pokoje (malý/velký pokoj)
 - ✅ Vyplnění osobních údajů nájemníka
-- ✅ Podmíněné vyplnění údajů podnájemníka (pro velký pokoj)
-- ✅ Nastavení období nájmu (datum od-do)
-- ✅ Volba data podpisu smlouvy
-- ✅ Náhled výsledných dokumentů (smlouva + předávací protokol)
-- ✅ Export do PDF
-- ✅ Automatický výpočet celkových nákladů podle počtu osob
+- ✅ Podmíněné vyplnění údajů podnájemníka
+- ✅ Nastavení období nájmu a data podpisu
+- ✅ Náhled dokumentů a export do PDF
+- ✅ Automatický výpočet nákladů
 
-## 🚀 Technologie
 
-- **Frontend**: Vite + React
-- **PDF generování**: pdfmake
-- **Styling**: Vanilla CSS s premium designem
-- **Date handling**: date-fns
-- **Deployment**: GitHub Actions + FTPS
-
-## 💻 Instalace a spuštění
-
-### Prerekvizity
-
-- Node.js 20+
-- npm
-
-### Lokální vývoj
-
-```bash
-# Instalace závislostí
-npm install
-
-# Spuštění dev serveru
-npm run dev
-
-# Build pro production
-npm run build
-
-# Preview production buildu
-npm run preview
-```
-
-Aplikace bude dostupná na `http://localhost:5173`
-
-## 📁 Struktura projektu
-
-```
-generator-najemnich-smluv/
-├── .github/
-│   └── workflows/
-│       └── deploy.yml          # GitHub Actions FTPS deployment
-├── src/
-│   ├── components/
-│   │   ├── ContractForm.jsx    # Hlavní wizard formulář
-│   │   ├── ContractPreview.jsx # Náhled dokumentů
-│   │   ├── PersonForm.jsx      # Formulář osobních údajů
-│   │   ├── RoomVariantSelector.jsx
-│   │   ├── DateRangeSelector.jsx
-│   │   └── SigningDateSelector.jsx
-│   ├── config/
-│   │   └── contractConfig.js   # Konfigurace smluv a variant pokojů
-│   ├── utils/
-│   │   ├── contractGenerator.js # Generování textů smluv
-│   │   ├── pdfGenerator.js      # PDF export pomocí pdfmake
-│   │   └── validation.js        # Validační funkce
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css               # Design system
-├── index.html
-├── package.json
-└── README.md
-```
-
-## ⚙️ Konfigurace
-
-Aktualizujte `src/config/contractConfig.js` pro úpravu:
-
-- Údajů pronajímatele
-- Variant pokojů a cen
-- Textů smluv a protokolů
-- Stavů měřičů
-- Adresy pronajímaného prostoru
+## 🔮 Plánovaný rozvoj
+Detailní plán funkcí pro další fáze (správa financí, databáze) najdete v souboru [features.md](./features.md).
 
 ## 🚢 Deployment
 
-Aplikace používá GitHub Actions pro automatický deployment přes FTPS.
-
-### Nastavení GitHub Secrets
-
-V nastavení GitHub repository přidejte následující secrets:
-
-- `FTP_SERVER` - adresa FTP serveru (např. `ftp.example.com`)
-- `FTP_USERNAME` - FTP uživatelské jméno
-- `FTP_PASSWORD` - FTP heslo
-
-### Deployment proces
-
-1. Push do `main` branch
-2. GitHub Actions automaticky:
-   - Nainstaluje závislosti
-   - Vytvoří production build
-   - Nahraje `dist` složku na server přes FTPS
-
-## 🔮 Plánované rozšíření
-
-### Fáze 2: Databáze a autentizace
-- PHP backend (Nette framework)
-- REST/GraphQL API
-- MySQL databáze
-- SSO přihlášení (Google, Apple, Seznam.cz)
-- Správa uživatelů s rolemi
-- CRUD pro nájemníky a smlouvy
-
-### Fáze 3: Platforma pro správu nájmu
-- Evidence plateb
-- Sledování výdajů
-- Dashboard s přehledy
-- Kalkulace zisku
-- Reporting a export
-
-## 📄 License
-
-© 2025 Generátor nájemních smluv
-
-## 👨‍💻 Autor
-
-Vytvořeno pomocí Antigravity AI
+Aplikace se nasazuje na FTP do podadresáře (např. `/modules/generator`), aby ji hlavní aplikace našla.
+Viz `.github/workflows/deploy.yml`.
