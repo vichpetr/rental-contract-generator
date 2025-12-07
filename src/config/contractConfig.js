@@ -279,7 +279,7 @@ export const contractConfig = {
   </div>
 
   <div style="page-break-inside: avoid;">
-    <p style="page-break-before: always; text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek VII.<br>Závěrečná ustanovení</p>
+    <p style="text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek VII.<br>Závěrečná ustanovení</p>
 
     <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
       <li style="margin-bottom: 5px;">Tato smlouva nabývá platnosti a účinnosti dnem podpisu smluvních stran.</li>
