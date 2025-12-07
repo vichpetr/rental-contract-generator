@@ -39,6 +39,10 @@ jobs:
           path: /home/runner/.npm/_logs/
           if-no-files-found: ignore
       
+      - name: Create .env file
+        run: |
+          echo "VITE_PORTAL_URL=${{ vars.VITE_PORTAL_URL }}" >> .env
+
       - name: Build application
         run: npm run build
         env:

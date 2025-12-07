@@ -14,6 +14,14 @@ npm run serve
 ```
 Aplikace poběží na `http://localhost:5001` a bude připravena pro napojení do Shell aplikace.
 
+## ⚙️ Konfigurace
+
+Aplikace využívá proměnné prostředí pro nastavení chování. V rootu projektu vytvořte soubor `.env` (inspirujte se v `.env.example`).
+
+| Proměnná | Popis | Výchozí hodnota |
+|----------|-------|-----------------|
+| `VITE_PORTAL_URL` | URL hlavní portálové aplikace pro přesměrování při přímém přístupu. | `https://home-portal.apps.petrvich.eu/` |
+
 ---
 
 ## 🏗 Architektura
