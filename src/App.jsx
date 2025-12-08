@@ -34,10 +34,22 @@ const AppRoutes = ({ user, authorized }) => (
   </Routes>
 );
 
-function App({ user, basename }) {
+import { setSession } from './lib/supabase';
+
+// ... (other imports)
+
+// ... (AppRoutes)
+
+function App({ user, session, basename }) {
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
+    // 1. Sync Session if provided (Embedded Mode)
+    if (session) {
+      setSession(session).catch(console.error);
+    }
+
+    // 2. Authorization Logic
     if (user) {
       setAuthorized(true);
       return;
@@ -52,7 +64,7 @@ function App({ user, basename }) {
     } else {
       window.location.href = PORTAL_URL;
     }
-  }, [user]);
+  }, [user, session]);
 
   if (!user && !authorized) {
     return (
@@ -64,7 +76,7 @@ function App({ user, basename }) {
     );
   }
 
-  const currentUser = user || (import.meta.env.MODE === 'development' ? { id: 'dev-user-id', email: 'dev@example.com' } : null);
+  const currentUser = user || (import.meta.env.MODE === 'development' ? { id: '00000000-0000-0000-0000-000000000000', email: 'dev@example.com' } : null);
   const isEmbedded = !!user || !!basename; // Proxy for embedded mode
 
   // If embedded, we use the Parent Router (shared context). 

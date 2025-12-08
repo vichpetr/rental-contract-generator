@@ -140,6 +140,13 @@ const PropertyEdit = ({ user }) => {
             console.error('Error saving property:', err);
             if (err.code === '42501') {
                 setError('Nemáte oprávnění upravovat tuto nemovitost.');
+            } else if (err.code === '23503' || (err.message && err.message.includes('foreign key constraint'))) {
+                // Check if it's the dev user
+                if (user?.id === '00000000-0000-0000-0000-000000000000') {
+                    setError('V režimu vývoje (Standalone) nelze ukládat data s fiktivním uživatelem. Prosím spusťte aplikaci přes Portál.');
+                } else {
+                    setError('Chyba integrity dat: ' + err.message);
+                }
             } else {
                 setError('Chyba při ukládání: ' + err.message);
             }

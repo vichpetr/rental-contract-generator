@@ -8,3 +8,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export const setSession = async (session) => {
+    if (!session) {
+        await supabase.auth.signOut();
+        return;
+    }
+    // Set the session for the client
+    // .setSession() expects { access_token, refresh_token }
+    await supabase.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token
+    });
+};
