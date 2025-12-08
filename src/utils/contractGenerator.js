@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { cs } from 'date-fns/locale';
-import { contractConfig } from '../config/contractConfig';
+
 
 /**
  * Nahradí placeholdery v šabloně skutečnými daty
@@ -62,14 +62,20 @@ export function getPersonWord(count) {
     return 'osob';
 }
 
+
 /**
  * Připraví data pro vyplnění šablony smlouvy
  */
-export function formatContractData(formData) {
+export function formatContractData(formData, config) {
     const { tenant, subtenant, roomVariantId, dateFrom, dateTo, signingDate, hasSubtenant } = formData;
 
+    // Ensure config is provided
+    if (!config) {
+        throw new Error('Konfigurace smlouvy nebyla načtena');
+    }
+
     // Najdi variantu pokoje
-    const roomVariant = contractConfig.roomVariants.find(r => r.id === roomVariantId);
+    const roomVariant = config.roomVariants.find(r => r.id === roomVariantId);
     if (!roomVariant) {
         throw new Error('Nenalezena varianta pokoje');
     }
@@ -88,11 +94,11 @@ export function formatContractData(formData) {
     // Základní data
     const templateData = {
         // Pronajímatel
-        LANDLORD_NAME: contractConfig.landlord.name,
-        LANDLORD_BIRTH_NUMBER: contractConfig.landlord.birthNumber,
-        LANDLORD_ADDRESS: formatAddress(contractConfig.landlord.address),
-        LANDLORD_PHONE: contractConfig.landlord.contact.phone,
-        LANDLORD_EMAIL: contractConfig.landlord.contact.email,
+        LANDLORD_NAME: config.landlord.name,
+        LANDLORD_BIRTH_NUMBER: config.landlord.birthNumber,
+        LANDLORD_ADDRESS: formatAddress(config.landlord.address),
+        LANDLORD_PHONE: config.landlord.contact.phone,
+        LANDLORD_EMAIL: config.landlord.contact.email,
 
         // Nájemce
         TENANT_NAME: `${tenant.firstName} ${tenant.lastName}`,
@@ -104,7 +110,7 @@ export function formatContractData(formData) {
         // Pokoj
         ROOM_NAME: roomVariant.name,
         ROOM_AREA: roomVariant.area,
-        PROPERTY_ADDRESS: `${contractConfig.property.street}, ${contractConfig.property.specificLocation}, ${contractConfig.property.postalCode} ${contractConfig.property.city}`,
+        PROPERTY_ADDRESS: `${config.property.street}, ${config.property.specificLocation}, ${config.property.postalCode} ${config.property.city}`,
 
         // Období
         DATE_FROM: formatDate(dateFrom),
@@ -116,21 +122,21 @@ export function formatContractData(formData) {
         TOTAL_MONTHLY: totalMonthly.toLocaleString('cs-CZ'),
         OCCUPANTS_COUNT: numberOfOccupants,
         PERSON_WORD: getPersonWord(numberOfOccupants),
-        BANK_ACCOUNT: formatBankAccount(contractConfig.landlord.bankAccount),
-        SECURITY_DEPOSIT: contractConfig.securityDeposit.amount.toLocaleString('cs-CZ'),
-        RENT_DUE_DAY: contractConfig.rentDueDay,
+        BANK_ACCOUNT: formatBankAccount(config.landlord.bankAccount),
+        SECURITY_DEPOSIT: config.securityDeposit.amount.toLocaleString('cs-CZ'),
+        RENT_DUE_DAY: config.rentDueDay,
 
         // Rozpad služeb
-        SERVICE_GAS: contractConfig.servicesBreakdown.gas.toLocaleString('cs-CZ'),
-        SERVICE_ELECTRICITY: contractConfig.servicesBreakdown.electricity.toLocaleString('cs-CZ'),
-        SERVICE_WATER: contractConfig.servicesBreakdown.coldWater.toLocaleString('cs-CZ'),
-        SERVICE_BUILDING: contractConfig.servicesBreakdown.buildingServices.toLocaleString('cs-CZ'),
+        SERVICE_GAS: config.servicesBreakdown.gas.toLocaleString('cs-CZ'),
+        SERVICE_ELECTRICITY: config.servicesBreakdown.electricity.toLocaleString('cs-CZ'),
+        SERVICE_WATER: config.servicesBreakdown.coldWater.toLocaleString('cs-CZ'),
+        SERVICE_BUILDING: config.servicesBreakdown.buildingServices.toLocaleString('cs-CZ'),
 
         // Ostatní
-        NOTICE_PERIOD: contractConfig.noticePeriodMonths,
+        NOTICE_PERIOD: config.noticePeriodMonths,
 
         // Podpis
-        SIGNING_PLACE: contractConfig.property.city,
+        SIGNING_PLACE: config.property.city,
         SIGNING_DATE: formatDate(signingDate || new Date()),
 
         // Počty kopií
@@ -148,10 +154,10 @@ export function formatContractData(formData) {
             SUBTENANT_EMAIL: subtenant.email,
         };
 
-        templateData.SUBTENANT_SECTION = fillTemplate(contractConfig.subtenantSection, subtenantData);
-        templateData.SUBTENANT_SIGNATURE = fillTemplate(contractConfig.subtenantSignature, subtenantData);
+        templateData.SUBTENANT_SECTION = fillTemplate(config.subtenantSection, subtenantData);
+        templateData.SUBTENANT_SIGNATURE = fillTemplate(config.subtenantSignature, subtenantData);
         templateData.SUBTENANT_PROTOCOL_SECTION = fillTemplate(
-            contractConfig.subtenantProtocolSection,
+            config.subtenantProtocolSection,
             subtenantData
         );
     } else {
@@ -167,36 +173,42 @@ export function formatContractData(formData) {
 /**
  * Připraví data pro předávací protokol
  */
-export function formatHandoverProtocolData(formData) {
-    const contractData = formatContractData(formData);
-    const roomVariant = contractConfig.roomVariants.find(r => r.id === formData.roomVariantId);
+export function formatHandoverProtocolData(formData, config) {
+    const contractData = formatContractData(formData, config);
+    const roomVariant = config.roomVariants.find(r => r.id === formData.roomVariantId);
+
+    // Using specific unit meter readings from DB if available, else falling back to global config structure
+    // Since useContractData maps unit[0] to global config.meterReadings, we use that as per current structure.
+    // Ideally we would check roomVariant.meter_readings if the DB structure was fully adapted here.
+    // But config.meterReadings is what the hook provides.
+    const meters = roomVariant.meter_readings || config.meterReadings;
 
     return {
         ...contractData,
         ROOM_FEATURES: roomVariant.features.map((f, i) => `${i + 1}. ${f}`).join('\n'),
-        ELECTRICITY_METER: contractConfig.meterReadings.electricity.meterNumber,
-        ELECTRICITY_UNIT: contractConfig.meterReadings.electricity.unit,
-        COLD_WATER_METER: contractConfig.meterReadings.water.cold.meterNumber,
-        COLD_WATER_UNIT: contractConfig.meterReadings.water.cold.unit,
-        HOT_WATER_METER: contractConfig.meterReadings.water.hot.meterNumber,
-        HOT_WATER_UNIT: contractConfig.meterReadings.water.hot.unit,
-        GAS_METER: contractConfig.meterReadings.gas.meterNumber,
-        GAS_UNIT: contractConfig.meterReadings.gas.unit,
+        ELECTRICITY_METER: meters.electricity.meterNumber,
+        ELECTRICITY_UNIT: meters.electricity.unit,
+        COLD_WATER_METER: meters.water.cold.meterNumber,
+        COLD_WATER_UNIT: meters.water.cold.unit,
+        HOT_WATER_METER: meters.water.hot.meterNumber,
+        HOT_WATER_UNIT: meters.water.hot.unit,
+        GAS_METER: meters.gas.meterNumber,
+        GAS_UNIT: meters.gas.unit,
     };
 }
 
 /**
  * Vygeneruje text smlouvy
  */
-export function generateContractText(formData) {
-    const data = formatContractData(formData);
-    return fillTemplate(contractConfig.contractTemplate, data);
+export function generateContractText(formData, config) {
+    const data = formatContractData(formData, config);
+    return fillTemplate(config.contractTemplate, data);
 }
 
 /**
  * Vygeneruje text předávacího protokolu
  */
-export function generateHandoverProtocolText(formData) {
-    const data = formatHandoverProtocolData(formData);
-    return fillTemplate(contractConfig.handoverProtocolTemplate, data);
+export function generateHandoverProtocolText(formData, config) {
+    const data = formatHandoverProtocolData(formData, config);
+    return fillTemplate(config.handoverProtocolTemplate, data);
 }

@@ -21,6 +21,14 @@ Aplikace využívá proměnné prostředí pro nastavení chování. V rootu pro
 | Proměnná | Popis | Výchozí hodnota |
 |----------|-------|-----------------|
 | `VITE_PORTAL_URL` | URL hlavní portálové aplikace pro přesměrování při přímém přístupu. | `https://home-portal.apps.petrvich.eu/` |
+| `VITE_SUPABASE_URL` | URL Supabase projektu. | - |
+| `VITE_SUPABASE_ANON_KEY` | Anon klíč pro přístup k Supabase API. | - |
+| `VITE_CORS_ALLOWED_ORIGINS` | Povolené domény pro CORS (oddělené čárkou nebo regex v /.../). | `*.apps.petrvich.eu`, `localhost` |
+
+## 🗄️ Databáze
+
+Schéma databáze a migrační skripty jsou umístěny v adresáři `database/`.
+Projekt vyžaduje tabulky properties, rental_units a contracts v Supabase.
 
 ---
 

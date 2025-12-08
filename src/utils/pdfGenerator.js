@@ -60,8 +60,8 @@ function removeTempElement(element) {
 /**
  * Vygeneruje PDF smlouvy
  */
-export function generateContractPDF(formData) {
-    const contractText = generateContractText(formData);
+export function generateContractPDF(formData, config) {
+    const contractText = generateContractText(formData, config);
     const tempDiv = createTempElement(contractText);
 
     const opt = { ...defaultOptions, filename: 'najemni-smlouva.pdf' };
@@ -80,8 +80,8 @@ export function generateContractPDF(formData) {
 /**
  * Vygeneruje PDF předávacího protokolu
  */
-export function generateHandoverProtocolPDF(formData) {
-    const protocolText = generateHandoverProtocolText(formData);
+export function generateHandoverProtocolPDF(formData, config) {
+    const protocolText = generateHandoverProtocolText(formData, config);
     const tempDiv = createTempElement(protocolText);
 
     const opt = { ...defaultOptions, filename: 'predavaci-protokol.pdf' };

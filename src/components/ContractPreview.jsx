@@ -3,9 +3,9 @@ import { generateContractText, generateHandoverProtocolText } from '../utils/con
 /**
  * Komponenta pro náhled výsledných dokumentů
  */
-export default function ContractPreview({ formData }) {
-    const contractText = generateContractText(formData);
-    const protocolText = generateHandoverProtocolText(formData);
+export default function ContractPreview({ formData, config }) {
+    const contractText = generateContractText(formData, config);
+    const protocolText = generateHandoverProtocolText(formData, config);
 
     return (
         <div className="fade-in">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { contractConfig } from '../config/contractConfig';
+import { useContractData } from '../hooks/useContractData';
 import { validateStep, validatePersonField } from '../utils/validation';
 import { generateBothPDFs, downloadPDF } from '../utils/pdfGenerator';
 import RoomVariantSelector from './RoomVariantSelector';
@@ -21,6 +21,7 @@ const STEPS = [
  * Hlavní formulář aplikace - Multi-step wizard
  */
 export default function ContractForm() {
+    const { loading, error, config } = useContractData();
     const [currentStep, setCurrentStep] = useState(0);
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
@@ -47,8 +48,16 @@ export default function ContractForm() {
         signingDate: format(new Date(), 'yyyy-MM-dd')
     });
 
+    if (loading) {
+        return <div className="loading">Načítám konfiguraci...</div>;
+    }
+
+    if (error || !config) {
+        return <div className="error">Chyba při načítání konfigurace: {error?.message}</div>;
+    }
+
     // Získej aktuální variantu pokoje
-    const selectedRoomVariant = contractConfig.roomVariants.find(
+    const selectedRoomVariant = config.roomVariants.find(
         r => r.id === formData.roomVariantId
     );
 
@@ -57,7 +66,7 @@ export default function ContractForm() {
 
     const handleNext = () => {
         // Validace aktuálního kroku
-        const stepErrors = validateStep(currentStep, formData, contractConfig.roomVariants);
+        const stepErrors = validateStep(currentStep, formData, config.roomVariants);
 
         if (stepErrors) {
             setErrors(stepErrors);
@@ -100,7 +109,7 @@ export default function ContractForm() {
     };
 
     const handleGeneratePDF = () => {
-        const pdf = generateBothPDFs(formData);
+        const pdf = generateBothPDFs(formData, config);
         const filename = `smlouva-${formData.tenant.lastName}-${format(new Date(), 'yyyy-MM-dd')}.pdf`;
         downloadPDF(pdf, filename);
     };
@@ -182,6 +191,7 @@ export default function ContractForm() {
                     <RoomVariantSelector
                         selectedId={formData.roomVariantId}
                         onChange={(id) => updateFormData('roomVariantId', id)}
+                        variants={config.roomVariants}
                     />
                 )}
 
@@ -231,6 +241,7 @@ export default function ContractForm() {
                             dateFrom={formData.dateFrom}
                             dateTo={formData.dateTo}
                             onChange={updateFormData}
+                            defaultDuration={config.defaultContractDuration}
                             errors={errors}
                         />
 
@@ -245,7 +256,7 @@ export default function ContractForm() {
 
                 {currentStep === 4 && (
                     <div>
-                        <ContractPreview formData={formData} />
+                        <ContractPreview formData={formData} config={config} />
 
                         <div style={{ marginTop: 'var(--space-xl)', padding: 'var(--space-lg)', background: 'var(--color-primary-50)', borderRadius: 'var(--radius-md)' }}>
                             <p style={{ marginBottom: 'var(--space-md)', fontWeight: 500 }}>

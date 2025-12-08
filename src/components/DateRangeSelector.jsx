@@ -1,9 +1,7 @@
-import { contractConfig } from '../config/contractConfig';
-
 /**
  * Komponenta pro výběr časového období nájmu
  */
-export default function DateRangeSelector({ dateFrom, dateTo, onChange, errors = {} }) {
+export default function DateRangeSelector({ dateFrom, dateTo, onChange, defaultDuration = 1, errors = {} }) {
 
     // Handler pro změnu data začátku - automaticky nastaví konečné datum
     const handleDateFromChange = (newDateFrom) => {
@@ -13,7 +11,7 @@ export default function DateRangeSelector({ dateFrom, dateTo, onChange, errors =
         if (!dateTo && newDateFrom) {
             const startDate = new Date(newDateFrom);
             const endDate = new Date(startDate);
-            endDate.setFullYear(startDate.getFullYear() + contractConfig.defaultContractDuration);
+            endDate.setFullYear(startDate.getFullYear() + defaultDuration);
 
             // Formátuj datum do formátu YYYY-MM-DD
             const formattedEndDate = endDate.toISOString().split('T')[0];
@@ -25,7 +23,7 @@ export default function DateRangeSelector({ dateFrom, dateTo, onChange, errors =
         <div className="fade-in">
             <h3 className="card-title">Období nájmu</h3>
             <p className="card-description" style={{ marginBottom: 'var(--space-xl)' }}>
-                Zadejte dobu trvání nájemní smlouvy (výchozí doba trvání je {contractConfig.defaultContractDuration} roky)
+                Zadejte dobu trvání nájemní smlouvy (výchozí doba trvání je {defaultDuration} roky)
             </p>
 
             <div className="form-grid form-grid-2">

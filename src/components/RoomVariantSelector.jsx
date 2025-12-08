@@ -1,10 +1,9 @@
-import { contractConfig } from '../config/contractConfig';
 import { calculateTotalMonthly } from '../utils/contractGenerator';
 
 /**
  * Komponenta pro výběr varianty pokoje
  */
-export default function RoomVariantSelector({ selectedId, onChange }) {
+export default function RoomVariantSelector({ selectedId, onChange, variants }) {
     return (
         <div className="fade-in">
             <h3 className="card-title">Vyberte variantu pokoje</h3>
@@ -13,7 +12,7 @@ export default function RoomVariantSelector({ selectedId, onChange }) {
             </p>
 
             <div className="room-variants">
-                {contractConfig.roomVariants.map((variant) => {
+                {variants?.map((variant) => {
                     const isSelected = selectedId === variant.id;
 
                     return (
