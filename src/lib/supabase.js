@@ -7,11 +7,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Missing Supabase environment variables. Database features will not work.');
 }
 
+// Default: Managed by parent (false) unless explicitly set to 'true'
+const enablePersistence = import.meta.env.VITE_SUPABASE_PERSIST_SESSION === 'true';
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-        persistSession: false, // Child app should rely on Parent's session, no local storage conflicts
-        autoRefreshToken: false, // Parent handles refresh
-        detectSessionInUrl: false // Parent handles auth flow
+        persistSession: enablePersistence,
+        autoRefreshToken: enablePersistence,
+        detectSessionInUrl: enablePersistence
     }
 });
 
