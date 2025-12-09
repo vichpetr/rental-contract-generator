@@ -7,7 +7,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Missing Supabase environment variables. Database features will not work.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+        persistSession: false, // Child app should rely on Parent's session, no local storage conflicts
+        autoRefreshToken: false, // Parent handles refresh
+        detectSessionInUrl: false // Parent handles auth flow
+    }
+});
 
 export const setSession = async (session) => {
     if (!session) {
