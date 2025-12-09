@@ -1,12 +1,18 @@
 import React from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 
-const Layout = ({ authorized }) => {
+const Layout = ({ authorized, basePath }) => {
     const location = useLocation();
 
+    // Helper to join paths safely
+    const resolvePath = (path) => {
+        const base = basePath || '';
+        return `${base}/${path}`.replace(/\/\//g, '/');
+    };
+
     const isActive = (path) => {
-        const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
-        return location.pathname.endsWith(normalizedPath);
+        // Simple check if current location ends with the target path (handles both relative/absolute nuances)
+        return location.pathname.endsWith(path);
     };
 
     return (
@@ -20,16 +26,14 @@ const Layout = ({ authorized }) => {
                     {authorized && (
                         <nav style={{ display: 'flex', gap: '20px' }}>
                             <Link
-                                to="properties"
-                                className={isActive('/properties') || isActive('properties') ? 'nav-link active' : 'nav-link'}
-                                style={{ color: 'white', textDecoration: 'none', fontWeight: (isActive('/properties') || isActive('properties')) ? 'bold' : 'normal' }}
+                                to={resolvePath('properties')}
+                                className={isActive('properties') ? 'nav-link active' : 'nav-link'}
                             >
                                 Nemovitosti
                             </Link>
                             <Link
-                                to="generator"
-                                className={isActive('/generator') || isActive('generator') ? 'nav-link active' : 'nav-link'}
-                                style={{ color: 'white', textDecoration: 'none', fontWeight: (isActive('/generator') || isActive('generator')) ? 'bold' : 'normal' }}
+                                to={resolvePath('generator')}
+                                className={isActive('generator') ? 'nav-link active' : 'nav-link'}
                             >
                                 Generátor
                             </Link>

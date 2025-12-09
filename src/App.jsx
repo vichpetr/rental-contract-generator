@@ -8,9 +8,9 @@ import UnitEdit from './pages/UnitEdit';
 import PropertyEdit from './pages/PropertyEdit';
 import './index.css';
 
-const AppRoutes = ({ user, authorized }) => (
+const AppRoutes = ({ user, authorized, basePath }) => (
   <Routes>
-    <Route element={<Layout authorized={authorized} />}>
+    <Route element={<Layout authorized={authorized} basePath={basePath} />}>
       {/* Redirect root to Properties if authorized, else Generator */}
       {/* Use relative path "" for root match */}
       {/* Redirect root to Properties if authorized, else Generator */}
@@ -83,16 +83,18 @@ function App({ user, session, basename }) {
 
   // If embedded, we use the Parent Router (shared context). 
   // We just render Layout > Routes.
+  const appBasePath = isEmbedded ? (basename || '/app/generator') : '';
+
   if (isEmbedded) {
     return (
-      <AppRoutes user={currentUser} authorized={authorized} />
+      <AppRoutes user={currentUser} authorized={authorized} basePath={appBasePath} />
     );
   }
 
   // Standalone mode: We need a Router.
   return (
     <Router basename={basename}>
-      <AppRoutes user={currentUser} authorized={authorized} />
+      <AppRoutes user={currentUser} authorized={authorized} basePath={appBasePath} />
     </Router>
   );
 }
