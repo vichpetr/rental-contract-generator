@@ -13,7 +13,9 @@ const AppRoutes = ({ user, authorized }) => (
     <Route element={<Layout authorized={authorized} />}>
       {/* Redirect root to Properties if authorized, else Generator */}
       {/* Use relative path "" for root match */}
-      <Route path="" element={<Navigate to="/properties" replace />} />
+      {/* Redirect root to Properties if authorized, else Generator */}
+      {/* Use relative path "" for root match */}
+      <Route path="" element={<Navigate to="properties" replace />} />
 
       {/* Properties Management */}
       <Route path="properties/new" element={<PropertyEdit user={user} />} />
@@ -28,8 +30,8 @@ const AppRoutes = ({ user, authorized }) => (
       {/* Original Generator */}
       <Route path="generator" element={<ContractForm />} />
 
-      {/* Fallback - use absolute path to avoid loop */}
-      <Route path="*" element={<Navigate to="/properties" replace />} />
+      {/* Fallback - use relative path to avoid breaking host app routing */}
+      <Route path="*" element={<Navigate to="properties" replace />} />
     </Route>
   </Routes>
 );
