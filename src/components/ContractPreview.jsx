@@ -19,9 +19,13 @@ export default function ContractPreview({ formData, config }) {
                     className="preview-content"
                     dangerouslySetInnerHTML={{
                         __html: `
-                            ${contractText}
-                            <div style="page-break-after: always;"></div>
-                            ${protocolText}
+                            <div class="contract-page">
+                                ${contractText}
+                            </div>
+                            <div class="page-break"></div>
+                            <div class="protocol-page">
+                                ${protocolText}
+                            </div>
                         `
                     }}
                 />

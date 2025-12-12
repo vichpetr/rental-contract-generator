@@ -25,7 +25,7 @@ const defaultOptions = {
         format: 'a4',
         orientation: 'portrait'
     },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    pagebreak: { mode: 'css', avoid: '.page-break-avoid' }
 };
 
 /**

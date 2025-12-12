@@ -677,3 +677,21 @@ body {
     transform: rotate(360deg);
   }
 }
+/* Print/PDF Page Breaks */
+.page-break {
+  page-break-after: always;
+  height: 0;
+  display: block;
+  clear: both;
+}
+
+.contract-page, 
+.protocol-page {
+  page-break-inside: auto; /* Allow breaking inside long pages */
+}
+
+/* Ensure no accidental margins create new pages */
+.contract-page > *:last-child,
+.protocol-page > *:last-child {
+  margin-bottom: 0;
+}

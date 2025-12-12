@@ -123,7 +123,9 @@ export function formatContractData(formData, config) {
         OCCUPANTS_COUNT: numberOfOccupants,
         PERSON_WORD: getPersonWord(numberOfOccupants),
         BANK_ACCOUNT: formatBankAccount(config.landlord.bankAccount),
-        SECURITY_DEPOSIT: config.securityDeposit.amount.toLocaleString('cs-CZ'),
+        SECURITY_DEPOSIT: (roomVariant.deposit && roomVariant.deposit > 0
+            ? roomVariant.deposit
+            : config.securityDeposit.amount).toLocaleString('cs-CZ'),
         RENT_DUE_DAY: config.rentDueDay,
 
         // Rozpad služeb

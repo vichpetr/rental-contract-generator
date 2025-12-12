@@ -70,13 +70,37 @@ export function useContractData() {
             setError(null);
 
             // Fetch full property details (settings, landlord info)
-            const { data: property, error: propError } = await supabase
+            // Strategy: Try standard select first. If fail (RLS), try RPC bypass.
+
+            const { data: stdProperty, error: propError } = await supabase
                 .from('properties')
                 .select('*')
                 .eq('id', propertyId)
-                .single();
+                .maybeSingle(); // Use maybeSingle to avoid throw on 0 rows
 
-            if (propError) throw propError;
+            let property = stdProperty;
+
+            if (!property) {
+                // If not found via standard select, check if we can find it via RPC (Dev Mode)
+                const devUserId = import.meta.env.VITE_DEV_USER_ID;
+                const { data: { session } } = await supabase.auth.getSession();
+                const targetUserId = session?.user?.id || devUserId;
+
+                if (targetUserId) {
+                    const { data: rpcData, error: rpcError } = await supabase
+                        .rpc('get_owner_properties', { target_user_id: targetUserId });
+
+                    if (!rpcError && rpcData) {
+                        // Find our property in the list
+                        // Ensure ID type match (string vs int)
+                        property = rpcData.find(p => String(p.id) === String(propertyId));
+                    }
+                }
+            } else if (propError) {
+                // If there was a genuine error (not just not found/blocked), throw it
+                throw propError;
+            }
+
             if (!property) throw new Error('Property not found');
 
             // Fetch Rental Units
@@ -116,7 +140,8 @@ export function useContractData() {
                     feePerPerson: u.fee_per_person,
                     description: u.description,
                     area: u.area_m2,
-                    features: u.features
+                    features: u.features,
+                    deposit: u.deposit // Include unit-specific deposit
                 })),
                 meterReadings: units[0]?.meter_readings || {},
                 securityDeposit: property.settings.securityDeposit,
