@@ -78,7 +78,8 @@ function App({ user, session, basename }) {
     );
   }
 
-  const currentUser = user || (import.meta.env.MODE === 'development' ? { id: '00000000-0000-0000-0000-000000000000', email: 'dev@example.com' } : null);
+  const defaultDevUserId = import.meta.env.VITE_DEV_USER_ID || '00000000-0000-0000-0000-000000000000';
+  const currentUser = user || (import.meta.env.MODE === 'development' ? { id: defaultDevUserId, email: 'dev@example.com' } : null);
   const isEmbedded = !!user || !!basename; // Proxy for embedded mode
 
   // If embedded, we use the Parent Router (shared context). 

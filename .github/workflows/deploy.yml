@@ -45,6 +45,8 @@ jobs:
           echo "VITE_SUPABASE_URL=${{ vars.VITE_SUPABASE_URL }}" >> .env
           echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
           echo "VITE_CORS_ALLOWED_ORIGINS=${{ vars.VITE_CORS_ALLOWED_ORIGINS }}" >> .env
+          echo "VITE_SUPABASE_PERSIST_SESSION=false" >> .env
+
 
       - name: Build application
         run: npm run build

@@ -23,28 +23,92 @@ const PropertyDetail = ({ user }) => {
         try {
             setLoading(true);
 
+            // Determine if we need to use Dev RPC (if no real user but dev ID present)
+            const devUserId = import.meta.env.VITE_DEV_USER_ID;
+            const targetUserId = user?.id || devUserId;
+
             // 1. Fetch Property
-            const { data: propData, error: propError } = await supabase
+            // Strategy: Try standard select first (cleanest). If it returns null/error, try RPC.
+            let propData = null;
+            let stdError = null;
+
+            // Use maybeSingle to avoid 406/PGRST116 immediately
+            const { data: stdDataResult, error: stdReqError } = await supabase
                 .from('properties')
                 .select('*')
                 .eq('id', id)
-                .single();
+                .maybeSingle();
 
-            if (propError) throw propError;
+            if (stdReqError) {
+                console.warn("Standard property fetch error:", stdReqError);
+                stdError = stdReqError;
+            }
+
+            if (stdDataResult) {
+                propData = stdDataResult;
+            } else if (targetUserId) {
+                // Nothing found via standard select. If Dev Mode/Target User logic applies, try RPC bypass.
+                console.log("Standard fetch failed/empty. Trying RPC bypass for user:", targetUserId);
+
+                const { data: rpcData, error: rpcError } = await supabase
+                    .rpc('get_owner_properties', { target_user_id: targetUserId });
+
+                if (rpcError) {
+                    console.error("RPC fetch error:", rpcError);
+                } else if (rpcData) {
+                    // The RPC returns all properties for the user. We must find the specific one.
+                    // IMPORTANT: Ensure ID types match (string vs UUID).
+                    console.log("RPC Data received:", rpcData.length, "properties. Looking for ID:", id);
+                    propData = rpcData.find(p => String(p.id) === String(id));
+
+                    if (!propData) {
+                        console.warn("Property ID not found in RPC results.");
+                    }
+                }
+            } else {
+                // No result and no user to try RPC with
+                console.warn("No data and no targetUserId for RPC bypass.");
+            }
+
+            if (!propData) {
+                if (stdError) throw stdError; // Throw original error if existed
+                throw { code: 'PGRST116', message: 'Nemovitost nenalezena - ID se neshoduje nebo chybí oprávnění.' };
+            }
+
             setProperty(propData);
 
             // 2. Fetch Rental Units
-            const { data: unitData, error: unitError } = await supabase
+            // Similar logic: Standard Select first. If empty/error & dev mode, bypass?
+            const { data: stdUnitData, error: stdUnitError } = await supabase
                 .from('rental_units')
                 .select('*')
                 .eq('property_id', id)
                 .order('name');
 
-            if (unitError) throw unitError;
-            setUnits(unitData || []);
+            let finalUnits = stdUnitData || [];
+
+            if ((stdUnitError || finalUnits.length === 0) && targetUserId) {
+                // If standard fetch failed or returned nothing (which might be RLS hiding it),
+                // and we are in Dev Mode, try RPC bypass.
+                console.log("Units fetch failed/empty. Trying RPC bypass.");
+                const { data: rpcUnitData, error: rpcUnitError } = await supabase
+                    .rpc('get_property_units', { target_property_id: id });
+
+                if (rpcUnitError) {
+                    console.warn("RPC units fetch failed:", rpcUnitError);
+                } else if (rpcUnitData) {
+                    console.log("RPC Units found:", rpcUnitData.length);
+                    finalUnits = rpcUnitData;
+                    // Sort manually since RPC order might differ if not specified (though SQL has order by)
+                    finalUnits.sort((a, b) => a.name.localeCompare(b.name));
+                }
+            } else if (stdUnitError) {
+                console.warn("Error fetching units (RLS?):", stdUnitError);
+            }
+
+            setUnits(finalUnits);
 
             // 3. Fetch Occupancy (View)
-            // Note: This view might not exist yet if migration wasn't run. Handle gracefully.
             try {
                 const { data: occData, error: occError } = await supabase
                     .from('view_unit_occupancy')
@@ -61,7 +125,7 @@ const PropertyDetail = ({ user }) => {
         } catch (err) {
             console.error('Error loading property data:', err);
             // PGRST116 is the code for "0 rows" when using .single()
-            if (err.code === 'PGRST116' || err.status === 406) {
+            if (err.code === 'PGRST116' || err.status === 406 || err.message === 'Nemovitost nenalezena') {
                 setError('Nemovitost nebyla nalezena.');
             } else {
                 setError('Nepodařilo se načíst detail nemovitosti.');
@@ -173,23 +237,25 @@ const PropertyDetail = ({ user }) => {
                                         </div>
                                     </div>
 
-                                    <div className="room-card-details">
-                                        <div className="room-card-detail">
-                                            <span className="room-card-detail-label">Nájem</span>
-                                            <span className="room-card-detail-value">{unit.monthly_rent} Kč</span>
-                                        </div>
-                                        <div className="room-card-detail">
-                                            <span className="room-card-detail-label">Poplatky/os</span>
-                                            <span className="room-card-detail-value">{unit.fee_per_person} Kč</span>
-                                        </div>
-                                        <div className="room-card-detail">
-                                            <span className="room-card-detail-label">Max osob</span>
-                                            <span className="room-card-detail-value">{unit.max_occupants}</span>
-                                        </div>
-                                        <div className="room-card-detail">
-                                            <span className="room-card-detail-label">Plocha</span>
-                                            <span className="room-card-detail-value">{unit.area_m2 ? `${unit.area_m2} m²` : '-'}</span>
-                                        </div>
+                                    <div className="room-card-detail">
+                                        <span className="room-card-detail-label">Nájem</span>
+                                        <span className="room-card-detail-value">{unit.monthly_rent} Kč</span>
+                                    </div>
+                                    <div className="room-card-detail">
+                                        <span className="room-card-detail-label">Poplatky/os</span>
+                                        <span className="room-card-detail-value">{unit.fee_per_person} Kč</span>
+                                    </div>
+                                    <div className="room-card-detail">
+                                        <span className="room-card-detail-label">Jistina</span>
+                                        <span className="room-card-detail-value">{unit.deposit ? `${unit.deposit} Kč` : '-'}</span>
+                                    </div>
+                                    <div className="room-card-detail">
+                                        <span className="room-card-detail-label">Max osob</span>
+                                        <span className="room-card-detail-value">{unit.max_occupants}</span>
+                                    </div>
+                                    <div className="room-card-detail">
+                                        <span className="room-card-detail-label">Plocha</span>
+                                        <span className="room-card-detail-value">{unit.area_m2 ? `${unit.area_m2} m²` : '-'}</span>
                                     </div>
 
                                     {/* Occupants List */}

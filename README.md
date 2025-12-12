@@ -24,6 +24,16 @@ Aplikace využívá proměnné prostředí pro nastavení chování. V rootu pro
 | `VITE_SUPABASE_URL` | URL Supabase projektu. | - |
 | `VITE_SUPABASE_ANON_KEY` | Anon klíč pro přístup k Supabase API. | - |
 | `VITE_CORS_ALLOWED_ORIGINS` | Povolené domény pro CORS (oddělené čárkou nebo regex v /.../). | `*.apps.petrvich.eu`, `localhost` |
+| `VITE_DEV_USER_ID` | **Pouze pro dev:** ID uživatele (UUID), kterého aplikace simuluje při vývoji (bypass auth). | `00000000-...` |
+
+## 🛠 Místní Vývoj a Data
+
+Aby aplikace viděla data při lokálním vývoji (kdy nejste přihlášeni přes Portál), je potřeba:
+
+1.  Mít spuštěný lokální Supabase (`supabase start`).
+2.  Mít aplikované migrace (včetně `v9_dev_rpc.sql` pro bypass RLS).
+3.  Nastavit `VITE_DEV_USER_ID` v `.env` na ID uživatele, který vlastní nemovitosti v DB.
+    *   ID zjistíte v Supabase Dashboardu (Authentication) nebo SQL dotazem: `select id, email from auth.users;`.
 
 ## 🗄️ Databáze
 

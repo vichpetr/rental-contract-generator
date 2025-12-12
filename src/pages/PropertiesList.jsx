@@ -17,15 +17,39 @@ const PropertiesList = ({ user }) => {
     const fetchProperties = async () => {
         try {
             setLoading(true);
-            // Fetch properties where user is owner OR has a role
-            // We can use the view or function, but direct select works as RLS handles filtering
-            const { data, error } = await supabase
-                .from('properties')
-                .select('*')
-                .order('name');
 
-            if (error) throw error;
-            setProperties(data || []);
+            // Determine if we need to use Dev RPC (if no real user but dev ID present)
+            const devUserId = import.meta.env.VITE_DEV_USER_ID;
+            const targetUserId = user?.id || devUserId;
+
+            if (!targetUserId) {
+                // Should not happen if parent handles auth, but safety check
+                setProperties([]);
+                setLoading(false);
+                return;
+            }
+
+            // Primary method: Standard Select (works if Authed)
+            // But if we are "mocked" locally, standard select fails RLS.
+            // So we try RPC if we suspect we are in dev mode or RLS might block.
+            // Simplest is to try RPC first for reliability in this mixed mode.
+
+            const { data, error } = await supabase
+                .rpc('get_owner_properties', { target_user_id: targetUserId });
+
+            if (error) {
+                // Fallback to standard request (e.g. if RPC not exists)
+                console.warn('RPC failed, trying standard select', error);
+                const { data: stdData, error: stdError } = await supabase
+                    .from('properties')
+                    .select('*')
+                    .order('name');
+                if (stdError) throw stdError;
+                setProperties(stdData || []);
+            } else {
+                setProperties(data || []);
+            }
+
         } catch (err) {
             console.error('Error fetching properties:', err);
             setError('Nepodařilo se načíst nemovitosti.');

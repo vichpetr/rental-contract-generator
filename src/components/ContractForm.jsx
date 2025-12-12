@@ -8,22 +8,30 @@ import PersonForm from './PersonForm';
 import DateRangeSelector from './DateRangeSelector';
 import SigningDateSelector from './SigningDateSelector';
 import ContractPreview from './ContractPreview';
+import PropertySelector from './PropertySelector';
 
 const STEPS = [
-    { id: 0, label: 'Výběr pokoje' },
-    { id: 1, label: 'Nájemce' },
-    { id: 2, label: 'Podnájemce' },
-    { id: 3, label: 'Období' },
-    { id: 4, label: 'Náhled' }
+    { id: 0, label: 'Nemovitost' },
+    { id: 1, label: 'Výběr pokoje' },
+    { id: 2, label: 'Nájemce' },
+    { id: 3, label: 'Podnájemce' },
+    { id: 4, label: 'Období' },
+    { id: 5, label: 'Náhled' }
 ];
 
 /**
  * Hlavní formulář aplikace - Multi-step wizard
  */
 export default function ContractForm() {
-    const { loading, error, config } = useContractData();
+    const { loading: initialLoading, error, properties, config, loadPropertyConfig } = useContractData();
+    const [configLoading, setConfigLoading] = useState(false);
+
+    // Step 0 is Property Selection, Step 1 is Room Variant, ...
     const [currentStep, setCurrentStep] = useState(0);
     const [errors, setErrors] = useState({});
+
+    // Data
+    const [selectedPropertyId, setSelectedPropertyId] = useState(null);
     const [formData, setFormData] = useState({
         roomVariantId: null,
         tenant: {
@@ -48,38 +56,70 @@ export default function ContractForm() {
         signingDate: format(new Date(), 'yyyy-MM-dd')
     });
 
-    if (loading) {
-        return <div className="loading">Načítám konfiguraci...</div>;
+    if (initialLoading) {
+        return <div className="loading">Načítám seznam nemovitostí...</div>;
     }
 
-    if (error || !config) {
-        return <div className="error">Chyba při načítání konfigurace: {error?.message}</div>;
+    if (error) {
+        return <div className="error">Chyba aplikace: {error?.message}</div>;
     }
 
-    // Získej aktuální variantu pokoje
-    const selectedRoomVariant = config.roomVariants.find(
+    // -- Handlers --
+
+    const handlePropertySelect = async (propertyId) => {
+        setSelectedPropertyId(propertyId);
+        setConfigLoading(true);
+        try {
+            const loadedConfig = await loadPropertyConfig(propertyId);
+            if (loadedConfig) {
+                setCurrentStep(1); // Move to "Vyber pokoje"
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Chyba při načítání dat nemovitosti');
+        } finally {
+            setConfigLoading(false);
+        }
+    };
+
+    const handlePropertyReset = () => {
+        setSelectedPropertyId(null);
+        setCurrentStep(0);
+        setFormData(prev => ({ ...prev, roomVariantId: null })); // Reset selected room
+    };
+
+    // Derived state from Config (only available if property selected)
+    const selectedRoomVariant = config?.roomVariants?.find(
         r => r.id === formData.roomVariantId
     );
-
-    // Kontrola, zda má být krok 2 (podnájemník) viditelný
     const shouldShowSubtenantStep = selectedRoomVariant?.maxOccupants === 2;
 
+    // Steps Logic
     const handleNext = () => {
-        // Validace aktuálního kroku
-        const stepErrors = validateStep(currentStep, formData, config.roomVariants);
+        // Validation logic depends on step index (shifted by 1 compared to original)
+        // Step 0 is Property (handled by onSelect)
+        // Step 1 is Room (original 0)
+        // Step 2 is Tenant (original 1)
+        // ...
 
-        if (stepErrors) {
-            setErrors(stepErrors);
-            return;
+        // Map current step to "validation step index" (original logic used 0-based index for form content)
+        const validationStepIndex = currentStep - 1;
+
+        if (currentStep > 0) {
+            const stepErrors = validateStep(validationStepIndex, formData, config.roomVariants);
+            if (stepErrors) {
+                setErrors(stepErrors);
+                return;
+            }
         }
-
         setErrors({});
 
-        // Pokud je krok 1 a pokoj je pro 1 osobu, přeskoč krok 2
-        if (currentStep === 1 && !shouldShowSubtenantStep) {
-            setCurrentStep(3);
-        } else if (currentStep === 2 && !formData.hasSubtenant) {
-            // Pokud uživatel na kroku 2 nezaškrtl podnájemníka, vymaž data
+        // Determine next step
+        if (currentStep === 2 && !shouldShowSubtenantStep) {
+            // Skip Subtenant (Step 3) if not needed
+            setCurrentStep(4);
+        } else if (currentStep === 3 && !formData.hasSubtenant) {
+            // Clear subtenant data if unchecked
             setFormData({
                 ...formData,
                 subtenant: {
@@ -100,9 +140,15 @@ export default function ContractForm() {
     const handleBack = () => {
         setErrors({});
 
-        // Pokud jsme na kroku 3 a pokoj je pro 1 osobu, vrať se na krok 1
-        if (currentStep === 3 && !shouldShowSubtenantStep) {
-            setCurrentStep(1);
+        if (currentStep === 1) {
+            // Back to Property Select
+            handlePropertyReset();
+            return;
+        }
+
+        if (currentStep === 4 && !shouldShowSubtenantStep) {
+            // Back from "Období" (4) to "Nájemce" (2) skipping Subtenant (3)
+            setCurrentStep(2);
         } else {
             setCurrentStep(currentStep - 1);
         }
@@ -115,56 +161,51 @@ export default function ContractForm() {
     };
 
     const updateFormData = (field, value) => {
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            [field]: value
-        }));
+        setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const updateTenant = (newTenant) => {
-        setFormData(prev => ({
-            ...prev,
-            tenant: newTenant
-        }));
-    };
+    const updateTenant = (newTenant) => setFormData(prev => ({ ...prev, tenant: newTenant }));
+    const updateSubtenant = (newSub) => setFormData(prev => ({ ...prev, subtenant: newSub }));
 
-    // Live validace jednotlivého pole nájemce
     const handleTenantFieldValidation = (field) => {
         const fieldError = validatePersonField(formData.tenant, field, true);
-        setErrors(prev => ({
-            ...prev,
-            ...fieldError
-        }));
+        setErrors(prev => ({ ...prev, ...fieldError }));
     };
 
-    const updateSubtenant = (newSubtenant) => {
-        setFormData(prev => ({
-            ...prev,
-            subtenant: newSubtenant
-        }));
-    };
-
-    // Live validace jednotlivého pole podnájemce
     const handleSubtenantFieldValidation = (field) => {
         const fieldError = validatePersonField(formData.subtenant, field, formData.hasSubtenant);
-        setErrors(prev => ({
-            ...prev,
-            ...fieldError
-        }));
+        setErrors(prev => ({ ...prev, ...fieldError }));
     };
 
-    // Určení, které kroky jsou dokončené
     const getStepStatus = (stepId) => {
         if (stepId < currentStep) return 'completed';
         if (stepId === currentStep) return 'active';
         return 'inactive';
     };
 
-    // Filtrování kroků podle varianty pokoje
+    // Filter steps visibility
     const visibleSteps = STEPS.filter(step => {
-        if (step.id === 2 && !shouldShowSubtenantStep) return false;
+        if (step.id === 3 && !shouldShowSubtenantStep) return false;
         return true;
     });
+
+    if (configLoading) {
+        return <div className="loading">Načítám konfiguraci nemovitosti...</div>;
+    }
+
+    // Step 0: Property Selector
+    if (currentStep === 0) {
+        return (
+            <PropertySelector
+                properties={properties}
+                onSelect={handlePropertySelect}
+                loading={initialLoading}
+            />
+        );
+    }
+
+    // Wizard (Steps 1+)
+    if (!config) return <div className="error">Chyba konfigurace</div>;
 
     return (
         <div>
@@ -185,9 +226,9 @@ export default function ContractForm() {
                 </div>
             </div>
 
-            {/* Formulář podle kroku */}
+            {/* Content */}
             <div className="card">
-                {currentStep === 0 && (
+                {currentStep === 1 && (
                     <RoomVariantSelector
                         selectedId={formData.roomVariantId}
                         onChange={(id) => updateFormData('roomVariantId', id)}
@@ -195,7 +236,7 @@ export default function ContractForm() {
                     />
                 )}
 
-                {currentStep === 1 && (
+                {currentStep === 2 && (
                     <PersonForm
                         title="Údaje hlavního nájemce"
                         person={formData.tenant}
@@ -205,13 +246,12 @@ export default function ContractForm() {
                     />
                 )}
 
-                {currentStep === 2 && shouldShowSubtenantStep && (
+                {currentStep === 3 && shouldShowSubtenantStep && (
                     <div className="fade-in">
                         <h3 className="card-title">Podnájemce</h3>
                         <p className="card-description" style={{ marginBottom: 'var(--space-lg)' }}>
                             Pokud bude pokoj obýván dvěma osobami, vyplňte údaje podnájemce
                         </p>
-
                         <div className="form-group">
                             <label className="checkbox-wrapper">
                                 <input
@@ -222,7 +262,6 @@ export default function ContractForm() {
                                 <span>Přidat podnájemce (rozdělení nákladů na 2 osoby)</span>
                             </label>
                         </div>
-
                         {formData.hasSubtenant && (
                             <PersonForm
                                 title="Údaje podnájemce"
@@ -235,7 +274,7 @@ export default function ContractForm() {
                     </div>
                 )}
 
-                {currentStep === 3 && (
+                {currentStep === 4 && (
                     <div>
                         <DateRangeSelector
                             dateFrom={formData.dateFrom}
@@ -244,7 +283,6 @@ export default function ContractForm() {
                             defaultDuration={config.defaultContractDuration}
                             errors={errors}
                         />
-
                         <div style={{ marginTop: 'var(--space-xl)' }}>
                             <SigningDateSelector
                                 signingDate={formData.signingDate}
@@ -254,10 +292,9 @@ export default function ContractForm() {
                     </div>
                 )}
 
-                {currentStep === 4 && (
+                {currentStep === 5 && (
                     <div>
                         <ContractPreview formData={formData} config={config} />
-
                         <div style={{ marginTop: 'var(--space-xl)', padding: 'var(--space-lg)', background: 'var(--color-primary-50)', borderRadius: 'var(--radius-md)' }}>
                             <p style={{ marginBottom: 'var(--space-md)', fontWeight: 500 }}>
                                 📄 Připraveno ke stažení
@@ -270,25 +307,23 @@ export default function ContractForm() {
                     </div>
                 )}
 
-                {/* Navigační tlačítka */}
+                {/* Buttons */}
                 <div className="btn-group" style={{ marginTop: 'var(--space-2xl)' }}>
-                    {currentStep > 0 && (
-                        <button className="btn btn-secondary" onClick={handleBack}>
-                            ← Zpět
-                        </button>
-                    )}
+                    <button className="btn btn-secondary" onClick={handleBack}>
+                        ← Zpět {currentStep === 1 && 'na výběr nemovitosti'}
+                    </button>
 
-                    {currentStep < 4 && (
+                    {currentStep < 5 && (
                         <button
                             className="btn btn-primary"
                             onClick={handleNext}
-                            disabled={currentStep === 0 && !formData.roomVariantId}
+                            disabled={currentStep === 1 && !formData.roomVariantId}
                         >
                             Pokračovat →
                         </button>
                     )}
 
-                    {currentStep === 4 && (
+                    {currentStep === 5 && (
                         <button className="btn btn-success" onClick={handleGeneratePDF}>
                             📥 Stáhnout PDF
                         </button>
