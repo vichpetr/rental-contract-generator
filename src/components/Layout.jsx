@@ -32,6 +32,12 @@ const Layout = ({ authorized, basePath }) => {
                                 Nemovitosti
                             </Link>
                             <Link
+                                to={resolvePath('tenants')}
+                                className={isActive('tenants') ? 'nav-link active' : 'nav-link'}
+                            >
+                                Nájemníci
+                            </Link>
+                            <Link
                                 to={resolvePath('generator')}
                                 className={isActive('generator') ? 'nav-link active' : 'nav-link'}
                             >

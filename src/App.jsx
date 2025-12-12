@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
 import ContractForm from './components/ContractForm';
 import Layout from './components/Layout';
 import PropertiesList from './pages/PropertiesList';
 import PropertyDetail from './pages/PropertyDetail';
 import UnitEdit from './pages/UnitEdit';
 import PropertyEdit from './pages/PropertyEdit';
+import TenantList from './pages/TenantList';
+import TenantEdit from './pages/TenantEdit';
 import './index.css';
 
 const AppRoutes = ({ user, authorized, basePath }) => (
@@ -27,8 +29,12 @@ const AppRoutes = ({ user, authorized, basePath }) => (
       {/* Unit Management */}
       <Route path="properties/:propertyId/units/:unitId" element={<UnitEdit user={user} />} />
 
+      {/* Tenant Management */}
+      <Route path="tenants" element={<TenantList user={user} />} />
+      <Route path="tenants/:id" element={<TenantEdit user={user} />} />
+
       {/* Original Generator */}
-      <Route path="generator" element={<ContractForm />} />
+      <Route path="generator" element={<ContractForm user={user} />} />
 
       {/* Fallback - use relative path to avoid breaking host app routing */}
       <Route path="*" element={<Navigate to="properties" replace />} />

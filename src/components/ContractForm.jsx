@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 import { useContractData } from '../hooks/useContractData';
 import { validateStep, validatePersonField } from '../utils/validation';
@@ -22,9 +23,80 @@ const STEPS = [
 /**
  * Hlavní formulář aplikace - Multi-step wizard
  */
-export default function ContractForm() {
+export default function ContractForm({ user }) {
     const { loading: initialLoading, error, properties, config, loadPropertyConfig } = useContractData();
     const [configLoading, setConfigLoading] = useState(false);
+
+    // Address Book State
+    const [savedTenants, setSavedTenants] = useState([]);
+
+    useEffect(() => {
+        if (user || import.meta.env.VITE_DEV_USER_ID) {
+            fetchSavedTenants();
+        }
+    }, [user]);
+
+    const fetchSavedTenants = async () => {
+        try {
+            const devUserId = import.meta.env.VITE_DEV_USER_ID;
+            const targetUserId = user?.id || devUserId;
+
+            if (!targetUserId) return;
+
+            const { data, error } = await supabase
+                .rpc('get_owner_tenants', { target_owner_id: targetUserId });
+
+            if (!error && data) {
+                setSavedTenants(data);
+            }
+        } catch (err) {
+            console.error("Failed to load address book", err);
+        }
+    };
+
+    const handleLoadTenant = (tenantId, isSubtenant = false) => {
+        if (!tenantId) return;
+        const person = savedTenants.find(t => String(t.id) === String(tenantId));
+        if (person) {
+            const mappedPerson = {
+                firstName: person.first_name,
+                lastName: person.last_name,
+                birthNumber: person.birth_number || '',
+                address: person.address_street || '',
+                phone: person.phone || '',
+                email: person.email || ''
+            };
+
+            if (isSubtenant) {
+                updateSubtenant(mappedPerson);
+            } else {
+                updateTenant(mappedPerson);
+            }
+        }
+    };
+
+    const renderTenantSelector = (isSubtenant = false) => {
+        if (savedTenants.length === 0) return null;
+        return (
+            <div className="form-group" style={{ marginBottom: 'var(--space-lg)', padding: 'var(--space-md)', background: 'var(--color-primary-50)', borderRadius: 'var(--radius-md)' }}>
+                <label className="form-label" style={{ marginBottom: 'var(--space-sm)' }}>
+                    📂 Načíst z adresáře (rychlé vyplnění)
+                </label>
+                <select
+                    className="form-input"
+                    onChange={(e) => handleLoadTenant(e.target.value, isSubtenant)}
+                    defaultValue=""
+                >
+                    <option value="" disabled>Vyberte uloženého nájemníka...</option>
+                    {savedTenants.map(t => (
+                        <option key={t.id} value={t.id}>
+                            {t.first_name} {t.last_name} ({t.email})
+                        </option>
+                    ))}
+                </select>
+            </div>
+        );
+    };
 
     // Step 0 is Property Selection, Step 1 is Room Variant, ...
     const [currentStep, setCurrentStep] = useState(0);
@@ -237,13 +309,16 @@ export default function ContractForm() {
                 )}
 
                 {currentStep === 2 && (
-                    <PersonForm
-                        title="Údaje hlavního nájemce"
-                        person={formData.tenant}
-                        onChange={updateTenant}
-                        onValidate={handleTenantFieldValidation}
-                        errors={errors}
-                    />
+                    <>
+                        {renderTenantSelector(false)}
+                        <PersonForm
+                            title="Údaje hlavního nájemce"
+                            person={formData.tenant}
+                            onChange={updateTenant}
+                            onValidate={handleTenantFieldValidation}
+                            errors={errors}
+                        />
+                    </>
                 )}
 
                 {currentStep === 3 && shouldShowSubtenantStep && (
@@ -263,13 +338,16 @@ export default function ContractForm() {
                             </label>
                         </div>
                         {formData.hasSubtenant && (
-                            <PersonForm
-                                title="Údaje podnájemce"
-                                person={formData.subtenant}
-                                onChange={updateSubtenant}
-                                onValidate={handleSubtenantFieldValidation}
-                                errors={errors}
-                            />
+                            <>
+                                {renderTenantSelector(true)}
+                                <PersonForm
+                                    title="Údaje podnájemce"
+                                    person={formData.subtenant}
+                                    onChange={updateSubtenant}
+                                    onValidate={handleSubtenantFieldValidation}
+                                    errors={errors}
+                                />
+                            </>
                         )}
                     </div>
                 )}
