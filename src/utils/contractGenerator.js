@@ -66,7 +66,10 @@ export function getPersonWord(count) {
 /**
  * Připraví data pro vyplnění šablony smlouvy
  */
-export function formatContractData(formData, config) {
+/**
+ * Připraví data pro vyplnění šablony smlouvy
+ */
+export function formatContractData(formData, config, qrCodeDataUrl) {
     const { tenant, subtenant, roomVariantId, dateFrom, dateTo, signingDate, hasSubtenant } = formData;
 
     // Ensure config is provided
@@ -128,6 +131,11 @@ export function formatContractData(formData, config) {
             : config.securityDeposit.amount).toLocaleString('cs-CZ'),
         RENT_DUE_DAY: config.rentDueDay,
 
+        // QR Platba
+        QR_PAYMENT: qrCodeDataUrl
+            ? `<img src="${qrCodeDataUrl}" alt="QR Platba" style="width: 150px; height: 150px; border: 1px solid #ddd; padding: 5px;">`
+            : '',
+
         // Rozpad služeb
         SERVICE_GAS: config.servicesBreakdown.gas.toLocaleString('cs-CZ'),
         SERVICE_ELECTRICITY: config.servicesBreakdown.electricity.toLocaleString('cs-CZ'),
@@ -176,13 +184,15 @@ export function formatContractData(formData, config) {
  * Připraví data pro předávací protokol
  */
 export function formatHandoverProtocolData(formData, config) {
-    const contractData = formatContractData(formData, config);
-    const roomVariant = config.roomVariants.find(r => r.id === formData.roomVariantId);
+    const contractData = formatContractData(formData, config); // Pass undefined for QR, not needed in protocol yet? Or maybe passing it is safe.
+    // ... existing ... but wait, formatHandoverProtocolData depends on formatContractData. 
+    // I should probably update formatHandoverProtocolData generic usage too, but it doesn't use QR.
+    // However, I need to update generateContractText to pass the argument.
+    // Let's finish the replacement of formatContractData first.
+    // Wait, create separate tools calls for separate functions if needed.
+    // This replacement covers formatContractData fully.
 
-    // Using specific unit meter readings from DB if available, else falling back to global config structure
-    // Since useContractData maps unit[0] to global config.meterReadings, we use that as per current structure.
-    // Ideally we would check roomVariant.meter_readings if the DB structure was fully adapted here.
-    // But config.meterReadings is what the hook provides.
+    const roomVariant = config.roomVariants.find(r => r.id === formData.roomVariantId);
     const meters = roomVariant.meter_readings || config.meterReadings;
 
     return {
@@ -202,8 +212,8 @@ export function formatHandoverProtocolData(formData, config) {
 /**
  * Vygeneruje text smlouvy
  */
-export function generateContractText(formData, config) {
-    const data = formatContractData(formData, config);
+export function generateContractText(formData, config, qrCodeDataUrl) {
+    const data = formatContractData(formData, config, qrCodeDataUrl);
     return fillTemplate(config.contractTemplate, data);
 }
 

@@ -128,6 +128,40 @@ export default function ContractForm({ user }) {
         signingDate: format(new Date(), 'yyyy-MM-dd')
     });
 
+    // QR Code State
+    const [qrCodeUrl, setQrCodeUrl] = useState(null);
+
+    const generateQrForPreview = async () => {
+        // Calculate Total Amount
+        const roomVariant = config?.roomVariants?.find(r => r.id === formData.roomVariantId);
+        if (!roomVariant) return;
+
+        const occupants = formData.hasSubtenant ? 2 : 1;
+        const totalAmount = roomVariant.monthlyRent + (roomVariant.feePerPerson * occupants);
+
+        // Message
+        const msg = `Najem ${formData.tenant.firstName} ${formData.tenant.lastName}`;
+
+        // Bank Account from Config
+        const { accountNumber, bankCode } = config.landlord.bankAccount || {};
+
+        // Generate
+        if (accountNumber && bankCode) {
+            const url = await import('../utils/qrGenerator').then(m =>
+                m.generatePaymentQR(accountNumber, bankCode, totalAmount, msg)
+            );
+            setQrCodeUrl(url);
+        }
+    };
+
+    // Generate QR when entering Step 5 (Preview)
+    useEffect(() => {
+        if (currentStep === 5 && config && formData.roomVariantId) {
+            generateQrForPreview();
+        }
+    }, [currentStep, config, formData.roomVariantId, formData.hasSubtenant]);
+
+
     if (initialLoading) {
         return <div className="loading">Načítám seznam nemovitostí...</div>;
     }
@@ -372,7 +406,7 @@ export default function ContractForm({ user }) {
 
                 {currentStep === 5 && (
                     <div>
-                        <ContractPreview formData={formData} config={config} />
+                        <ContractPreview formData={formData} config={config} qrCodeUrl={qrCodeUrl} />
                         <div style={{ marginTop: 'var(--space-xl)', padding: 'var(--space-lg)', background: 'var(--color-primary-50)', borderRadius: 'var(--radius-md)' }}>
                             <p style={{ marginBottom: 'var(--space-md)', fontWeight: 500 }}>
                                 📄 Připraveno ke stažení

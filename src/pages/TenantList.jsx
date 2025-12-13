@@ -90,11 +90,15 @@ export default function TenantList({ user }) {
                         <div key={tenant.id} className="room-card" style={{ cursor: 'default' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
-                                    <h3 className="room-card-title">{tenant.first_name} {tenant.last_name}</h3>
+                                    <h3 className="room-card-title">
+                                        <Link to={`${tenant.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            {tenant.first_name} {tenant.last_name}
+                                        </Link>
+                                    </h3>
                                     <p className="room-card-description">{tenant.email} • {tenant.phone}</p>
                                 </div>
                                 <div className="btn-group" style={{ gap: 'var(--space-sm)' }}>
-                                    <Link to={`${tenant.id}`} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+                                    <Link to={`${tenant.id}/edit`} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
                                         Upravit
                                     </Link>
                                     <button

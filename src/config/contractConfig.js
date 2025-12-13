@@ -247,6 +247,9 @@ export const contractConfig = {
       <li style="margin-bottom: 5px;">Způsob placení nájemného: Platby se uskutečňují převodem na bankovní účet uvedený v položce „Číslo účtu pronajímatele".</li>
       <li style="margin-bottom: 5px;">Kromě nájemného se nájemce zavazuje hradit zálohy na služby spojené s užíváním nemovitosti.</li>
     </ol>
+    <div style="text-align: center; margin-top: 10px;">
+      {{QR_PAYMENT}}
+    </div>
   </div>
 
   <div style="page-break-inside: avoid;">

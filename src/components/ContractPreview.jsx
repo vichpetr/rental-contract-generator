@@ -3,8 +3,8 @@ import { generateContractText, generateHandoverProtocolText } from '../utils/con
 /**
  * Komponenta pro náhled výsledných dokumentů
  */
-export default function ContractPreview({ formData, config }) {
-    const contractText = generateContractText(formData, config);
+export default function ContractPreview({ formData, config, qrCodeUrl }) {
+    const contractText = generateContractText(formData, config, qrCodeUrl);
     const protocolText = generateHandoverProtocolText(formData, config);
 
     return (

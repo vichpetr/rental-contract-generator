@@ -8,6 +8,7 @@ import UnitEdit from './pages/UnitEdit';
 import PropertyEdit from './pages/PropertyEdit';
 import TenantList from './pages/TenantList';
 import TenantEdit from './pages/TenantEdit';
+import TenantDetail from './pages/TenantDetail';
 import './index.css';
 
 const AppRoutes = ({ user, authorized, basePath }) => (
@@ -31,7 +32,9 @@ const AppRoutes = ({ user, authorized, basePath }) => (
 
       {/* Tenant Management */}
       <Route path="tenants" element={<TenantList user={user} />} />
-      <Route path="tenants/:id" element={<TenantEdit user={user} />} />
+      <Route path="tenants/new" element={<TenantEdit user={user} />} />
+      <Route path="tenants/:id" element={<TenantDetail user={user} />} />
+      <Route path="tenants/:id/edit" element={<TenantEdit user={user} />} />
 
       {/* Original Generator */}
       <Route path="generator" element={<ContractForm user={user} />} />

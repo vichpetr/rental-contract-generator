@@ -3,7 +3,7 @@ import { useState } from 'react';
 /**
  * Reusable formulář pro osobní údaje nájemníka/podnájemníka
  */
-export default function PersonForm({ person, onChange, errors = {}, title, onValidate }) {
+export default function PersonForm({ person, onChange, errors = {}, title, onValidate, showDateOfBirth = false }) {
     const handleChange = (field, value) => {
         onChange({
             ...person,
@@ -22,8 +22,8 @@ export default function PersonForm({ person, onChange, errors = {}, title, onVal
         <div className="fade-in">
             {title && <h3 className="card-title">{title}</h3>}
 
-            {/* První řádek: Jméno a Příjmení (2 sloupce) */}
-            <div className="form-grid form-grid-2">
+            {/* První řádek: Jméno, Příjmení + volitelně Datum narození */}
+            <div className={`form-grid ${showDateOfBirth ? 'form-grid-3' : 'form-grid-2'}`}>
                 <div className="form-group">
                     <label className="form-label required" htmlFor="firstName">
                         Jméno
@@ -59,6 +59,25 @@ export default function PersonForm({ person, onChange, errors = {}, title, onVal
                         <span className="form-error">{errors.lastName}</span>
                     )}
                 </div>
+
+                {showDateOfBirth && (
+                    <div className="form-group">
+                        <label className="form-label" htmlFor="dateOfBirth">
+                            Datum narození
+                        </label>
+                        <input
+                            id="dateOfBirth"
+                            type="date"
+                            className={`form-input ${errors.dateOfBirth ? 'error' : ''}`}
+                            value={person.dateOfBirth || ''}
+                            onChange={(e) => handleChange('dateOfBirth', e.target.value)}
+                            onBlur={() => handleBlur('dateOfBirth')}
+                        />
+                        {errors.dateOfBirth && (
+                            <span className="form-error">{errors.dateOfBirth}</span>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Druhý řádek: Číslo dokladu, Telefon, Email (3 sloupce) */}
