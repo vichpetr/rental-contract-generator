@@ -1,7 +1,12 @@
+
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
+import { useProperty } from '../context/PropertyContext';
+
 const Sidebar = ({ basePath, isCollapsed, toggleCollapse }) => {
+    const { selectedProperty } = useProperty();
+
     // Helper to join paths safely
     const resolvePath = (path) => {
         const base = basePath || '';
@@ -22,19 +27,48 @@ const Sidebar = ({ basePath, isCollapsed, toggleCollapse }) => {
                 {!isCollapsed && <span className="logo-text">Správa bytů</span>}
             </div>
 
+
+
             <nav className="sidebar-nav">
-                <NavLink to={resolvePath('properties')} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Nemovitosti">
+                <NavLink to={resolvePath('')} end className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Přehled">
+                    <span className="icon">📊</span>
+                    {!isCollapsed && <span>Přehled</span>}
+                </NavLink>
+
+                <div style={{ height: '1px', background: '#e9ecef', margin: '0.5rem 0' }}></div>
+
+                <NavLink
+                    to={resolvePath(selectedProperty ? `properties/${selectedProperty.id}` : 'properties')}
+                    className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                    title={selectedProperty ? `Detail: ${selectedProperty.name}` : "Seznam nemovitostí"}
+                >
                     <span className="icon">🏠</span>
                     {!isCollapsed && <span>Nemovitosti</span>}
                 </NavLink>
-                <NavLink to={resolvePath('tenants')} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Nájemníci">
-                    <span className="icon">👥</span>
-                    {!isCollapsed && <span>Nájemníci</span>}
-                </NavLink>
-                <NavLink to={resolvePath('generator')} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Generátor">
-                    <span className="icon">🎎</span>
-                    {!isCollapsed && <span>Generátor</span>}
-                </NavLink>
+
+                {selectedProperty ? (
+                    <>
+                        <NavLink to={resolvePath('tenants')} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Nájemníci">
+                            <span className="icon">👥</span>
+                            {!isCollapsed && <span>Nájemníci</span>}
+                        </NavLink>
+                        <NavLink to={resolvePath('generator')} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Generátor">
+                            <span className="icon">🎎</span>
+                            {!isCollapsed && <span>Generátor</span>}
+                        </NavLink>
+                    </>
+                ) : (
+                    <>
+                        <div className={`nav-item disabled ${isCollapsed ? 'justify-center' : ''}`} title="Vyberte nemovitost">
+                            <span className="icon" style={{ opacity: 0.5 }}>👥</span>
+                            {!isCollapsed && <span style={{ opacity: 0.5 }}>Nájemníci</span>}
+                        </div>
+                        <div className={`nav-item disabled ${isCollapsed ? 'justify-center' : ''}`} title="Vyberte nemovitost">
+                            <span className="icon" style={{ opacity: 0.5 }}>🎎</span>
+                            {!isCollapsed && <span style={{ opacity: 0.5 }}>Generátor</span>}
+                        </div>
+                    </>
+                )}
             </nav>
 
             <button className="sidebar-toggle" onClick={toggleCollapse} title={isCollapsed ? "Rozbalit menu" : "Sbalit menu"}>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 import { useContractData } from '../hooks/useContractData';
+import { useProperty } from '../context/PropertyContext'; // Import context
 import { validateStep, validatePersonField } from '../utils/validation';
 import { generateBothPDFs, downloadPDF } from '../utils/pdfGenerator';
 import RoomVariantSelector from './RoomVariantSelector';
@@ -11,8 +12,9 @@ import SigningDateSelector from './SigningDateSelector';
 import ContractPreview from './ContractPreview';
 import PropertySelector from './PropertySelector';
 
+// Modified STEPS to exclude Property selection if handled by context
 const STEPS = [
-    { id: 0, label: 'Nemovitost' },
+    // { id: 0, label: 'Nemovitost' }, // Skipped if context active
     { id: 1, label: 'Výběr pokoje' },
     { id: 2, label: 'Nájemce' },
     { id: 3, label: 'Podnájemce' },
@@ -25,7 +27,15 @@ const STEPS = [
  */
 export default function ContractForm({ user }) {
     const { loading: initialLoading, error, properties, config, loadPropertyConfig } = useContractData();
+    const { selectedProperty } = useProperty(); // Get global selected property
+
+    // If we have global property, we start at step 1 (Room Selection), else step 0. 
+    // However, since we disable Generator tab if no property selected, we can assume we always start at step 1 or load it.
+    // Let's safe guard: default to 1 if selectedProperty exists.
+    const [currentStep, setCurrentStep] = useState(selectedProperty ? 1 : 0);
+
     const [configLoading, setConfigLoading] = useState(false);
+    const [errors, setErrors] = useState({});
 
     // Address Book State
     const [savedTenants, setSavedTenants] = useState([]);
@@ -35,6 +45,8 @@ export default function ContractForm({ user }) {
             fetchSavedTenants();
         }
     }, [user]);
+
+
 
     const fetchSavedTenants = async () => {
         try {
@@ -108,10 +120,6 @@ export default function ContractForm({ user }) {
         );
     };
 
-    // Step 0 is Property Selection, Step 1 is Room Variant, ...
-    const [currentStep, setCurrentStep] = useState(0);
-    const [errors, setErrors] = useState({});
-
     // Data
     const [selectedPropertyId, setSelectedPropertyId] = useState(null);
     const [formData, setFormData] = useState({
@@ -173,24 +181,17 @@ export default function ContractForm({ user }) {
     }, [currentStep, config, formData.roomVariantId, formData.hasSubtenant]);
 
 
-    if (initialLoading) {
-        return <div className="loading">Načítám seznam nemovitostí...</div>;
-    }
 
-    if (error) {
-        return <div className="error">Chyba aplikace: {error?.message}</div>;
-    }
 
     // -- Handlers --
 
     const handlePropertySelect = async (propertyId) => {
+        if (!propertyId) return;
         setSelectedPropertyId(propertyId);
         setConfigLoading(true);
         try {
-            const loadedConfig = await loadPropertyConfig(propertyId);
-            if (loadedConfig) {
-                setCurrentStep(1); // Move to "Vyber pokoje"
-            }
+            await loadPropertyConfig(propertyId);
+            // Don't force set step here if we are already initialized
         } catch (e) {
             console.error(e);
             alert('Chyba při načítání dat nemovitosti');
@@ -199,11 +200,14 @@ export default function ContractForm({ user }) {
         }
     };
 
-    const handlePropertyReset = () => {
-        setSelectedPropertyId(null);
-        setCurrentStep(0);
-        setFormData(prev => ({ ...prev, roomVariantId: null })); // Reset selected room
-    };
+    // Load property config when selectedProperty changes
+    useEffect(() => {
+        if (selectedProperty) {
+            handlePropertySelect(selectedProperty.id);
+        }
+    }, [selectedProperty]);
+
+    // Note: handlePropertyReset is removed or unused because we rely on global context switch
 
     // Derived state from Config (only available if property selected)
     const selectedRoomVariant = config?.roomVariants?.find(
@@ -214,20 +218,28 @@ export default function ContractForm({ user }) {
     // Steps Logic
     const handleNext = () => {
         // Validation logic depends on step index (shifted by 1 compared to original)
-        // Step 0 is Property (handled by onSelect)
-        // Step 1 is Room (original 0)
-        // Step 2 is Tenant (original 1)
-        // ...
+        // Step 0 is Property (now skipped/handled globally)
+        // Step 1 is Room
 
-        // Map current step to "validation step index" (original logic used 0-based index for form content)
-        const validationStepIndex = currentStep - 1;
+        // Map current step to "validation step index" 
+        // Original logic: 0=Property, 1=Room, 2=Tenant...
+        // New logic: 1=Room, 2=Tenant...
+        // So validation index matches step index - 1 ? No, standard validation usually expects 0-based index for its internal logic?
+        // Let's check validateStep -> it switches on 0, 1, 2...
+        // 0 case was unused/undefined in previous code for Property.
+        // 1 case was Room.
+        // So currentStep - 1 is correct if we start at 1.
 
-        if (currentStep > 0) {
-            const stepErrors = validateStep(validationStepIndex, formData, config.roomVariants);
-            if (stepErrors) {
-                setErrors(stepErrors);
-                return;
-            }
+        const validationStepIndex = currentStep; // Actually validateStep likely expects 1 for Room, 2 for Tenant... let's check validation.js if accessible. 
+        // Assuming previous code: `const validationStepIndex = currentStep - 1;` where currentStep 1 was Room.
+        // So Room = 0 in validation? 
+        // "Step 1 is Room (original 0)" comment says it.
+        // So we keep `currentStep - 1` logic.
+
+        const stepErrors = validateStep(currentStep - 1, formData, config?.roomVariants);
+        if (stepErrors) {
+            setErrors(stepErrors);
+            return;
         }
         setErrors({});
 
@@ -258,8 +270,9 @@ export default function ContractForm({ user }) {
         setErrors({});
 
         if (currentStep === 1) {
-            // Back to Property Select
-            handlePropertyReset();
+            // If we are at first step (Room), we can't go back to Property step if context locked it.
+            // Just return or do nothing. Or maybe navigate away? 
+            // For now, do nothing.
             return;
         }
 
@@ -277,6 +290,7 @@ export default function ContractForm({ user }) {
         downloadPDF(pdf, filename);
     };
 
+    // Update helpers
     const updateFormData = (field, value) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
@@ -306,23 +320,25 @@ export default function ContractForm({ user }) {
         return true;
     });
 
+    if (initialLoading) {
+        return <div className="loading">Načítám seznam nemovitostí...</div>;
+    }
+
+    if (error) {
+        return <div className="error">Chyba aplikace: {error?.message}</div>;
+    }
+
     if (configLoading) {
         return <div className="loading">Načítám konfiguraci nemovitosti...</div>;
     }
 
-    // Step 0: Property Selector
-    if (currentStep === 0) {
-        return (
-            <PropertySelector
-                properties={properties}
-                onSelect={handlePropertySelect}
-                loading={initialLoading}
-            />
-        );
+    // If no property selected in context (should catch by disabled menu, but backup)
+    if (!selectedProperty && !selectedPropertyId) {
+        return <div className="p-4">Nejprve vyberte nemovitost v menu.</div>;
     }
 
     // Wizard (Steps 1+)
-    if (!config) return <div className="error">Chyba konfigurace</div>;
+    if (!config) return <div className="error">Chyba konfigurace (Config failed to load)</div>;
 
     return (
         <div>
@@ -334,7 +350,7 @@ export default function ContractForm({ user }) {
                         return (
                             <div key={step.id} className={`progress-step ${status}`}>
                                 <div className="progress-step-circle">
-                                    {status === 'completed' ? '✓' : step.id + 1}
+                                    {status === 'completed' ? '✓' : step.id}
                                 </div>
                                 <span className="progress-step-label">{step.label}</span>
                             </div>
@@ -432,8 +448,9 @@ export default function ContractForm({ user }) {
 
                 {/* Buttons */}
                 <div className="btn-group" style={{ marginTop: 'var(--space-2xl)' }}>
-                    <button className="btn btn-secondary" onClick={handleBack}>
-                        ← Zpět {currentStep === 1 && 'na výběr nemovitosti'}
+                    {/* Disable Back on first step */}
+                    <button className="btn btn-secondary" onClick={handleBack} disabled={currentStep === 1}>
+                        ← Zpět
                     </button>
 
                     {currentStep < 5 && (

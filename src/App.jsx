@@ -11,38 +11,40 @@ import TenantEdit from './pages/TenantEdit';
 import TenantDetail from './pages/TenantDetail';
 import './index.css';
 
+import { PropertyProvider } from './context/PropertyContext';
+import Dashboard from './pages/Dashboard';
+
 const AppRoutes = ({ user, authorized, basePath, isEmbedded }) => (
-  <Routes>
-    <Route element={<Layout authorized={authorized} basePath={basePath} isEmbedded={isEmbedded} />}>
-      {/* Redirect root to Properties if authorized, else Generator */}
-      {/* Use relative path "" for root match */}
-      {/* Redirect root to Properties if authorized, else Generator */}
-      {/* Use relative path "" for root match */}
-      <Route path="" element={<Navigate to="properties" replace />} />
+  <PropertyProvider>
+    <Routes>
+      <Route element={<Layout authorized={authorized} basePath={basePath} isEmbedded={isEmbedded} />}>
+        {/* Root - Dashboard */}
+        <Route path="" element={<Dashboard />} />
 
-      {/* Properties Management */}
-      <Route path="properties/new" element={<PropertyEdit user={user} />} />
-      <Route path="properties/:id/edit" element={<PropertyEdit user={user} />} />
+        {/* Properties Management */}
+        <Route path="properties/new" element={<PropertyEdit user={user} />} />
+        <Route path="properties/:id/edit" element={<PropertyEdit user={user} />} />
 
-      <Route path="properties" element={<PropertiesList user={user} />} />
-      <Route path="properties/:id" element={<PropertyDetail user={user} />} />
+        <Route path="properties" element={<PropertiesList user={user} />} />
+        <Route path="properties/:id" element={<PropertyDetail user={user} />} />
 
-      {/* Unit Management */}
-      <Route path="properties/:propertyId/units/:unitId" element={<UnitEdit user={user} />} />
+        {/* Unit Management */}
+        <Route path="properties/:propertyId/units/:unitId" element={<UnitEdit user={user} />} />
 
-      {/* Tenant Management */}
-      <Route path="tenants" element={<TenantList user={user} />} />
-      <Route path="tenants/new" element={<TenantEdit user={user} />} />
-      <Route path="tenants/:id" element={<TenantDetail user={user} />} />
-      <Route path="tenants/:id/edit" element={<TenantEdit user={user} />} />
+        {/* Tenant Management */}
+        <Route path="tenants" element={<TenantList user={user} />} />
+        <Route path="tenants/new" element={<TenantEdit user={user} />} />
+        <Route path="tenants/:id" element={<TenantDetail user={user} />} />
+        <Route path="tenants/:id/edit" element={<TenantEdit user={user} />} />
 
-      {/* Original Generator */}
-      <Route path="generator" element={<ContractForm user={user} />} />
+        {/* Original Generator */}
+        <Route path="generator" element={<ContractForm user={user} />} />
 
-      {/* Fallback - use relative path to avoid breaking host app routing */}
-      <Route path="*" element={<Navigate to="properties" replace />} />
-    </Route>
-  </Routes>
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="" replace />} />
+      </Route>
+    </Routes>
+  </PropertyProvider>
 );
 
 import { setSession } from './lib/supabase';

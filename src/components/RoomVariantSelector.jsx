@@ -12,6 +12,12 @@ export default function RoomVariantSelector({ selectedId, onChange, variants }) 
             </p>
 
             <div className="room-variants">
+                {(!variants || variants.length === 0) && (
+                    <div className="text-center py-8 text-gray-500 w-full">
+                        <p>Tato nemovitost nemá definované žádné pokoje k pronájmu.</p>
+                        <p className="text-sm mt-2">Přidejte pokoje v editaci nemovitosti.</p>
+                    </div>
+                )}
                 {variants?.map((variant) => {
                     const isSelected = selectedId === variant.id;
 

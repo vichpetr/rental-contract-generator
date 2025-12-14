@@ -110,12 +110,17 @@ export function useContractData() {
                 .eq('property_id', propertyId)
                 .order('monthly_rent', { ascending: true });
 
+            console.log('[useContractData] fetching units for:', propertyId);
+            console.log('[useContractData] stdUnits:', stdUnits?.length, 'error:', stdUnitsError);
+
             let finalUnits = stdUnits || [];
 
             if (stdUnitsError || finalUnits.length === 0) {
                 // Try RPC Fallback
                 const { data: rpcUnits, error: rpcError } = await supabase
                     .rpc('get_property_units', { target_property_id: propertyId });
+
+                console.log('[useContractData] rpcUnits:', rpcUnits?.length, 'error:', rpcError);
 
                 if (!rpcError && rpcUnits) {
                     finalUnits = rpcUnits;
@@ -127,6 +132,7 @@ export function useContractData() {
             }
 
             const units = finalUnits;
+            console.log('[useContractData] final units count:', units.length);
 
             // Fetch Property Meters (New SQL Source)
             let propertyMeters = [];
