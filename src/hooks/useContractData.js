@@ -161,7 +161,8 @@ export function useContractData() {
                     description: u.description,
                     area: u.area_m2,
                     features: u.features,
-                    deposit: u.deposit // Include unit-specific deposit
+                    deposit: u.deposit,
+                    rentDueDay: u.rent_due_day // Include unit-specific rent due day
                 })),
                 meterReadings: propertyMeters.length > 0
                     ? propertyMeters

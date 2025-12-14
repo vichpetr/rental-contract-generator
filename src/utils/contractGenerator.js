@@ -145,7 +145,7 @@ export function formatContractData(formData, config, qrCodeDataUrl) {
         SECURITY_DEPOSIT: (roomVariant.deposit && roomVariant.deposit > 0
             ? roomVariant.deposit
             : config.securityDeposit.amount).toLocaleString('cs-CZ'),
-        RENT_DUE_DAY: config.rentDueDay,
+        RENT_DUE_DAY: roomVariant.rentDueDay,
 
         // QR Platba
         QR_PAYMENT: qrCodeDataUrl

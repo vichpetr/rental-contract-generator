@@ -19,7 +19,8 @@ const UnitEdit = ({ user }) => {
         max_occupants: 1,
         area_m2: 0,
         features: '', // Joined by comma for UI
-        property_id: propertyId
+        property_id: propertyId,
+        rent_due_day: '', // New field, default empty (null)
     });
 
     const isNew = !unitId || unitId === 'new';
@@ -68,7 +69,8 @@ const UnitEdit = ({ user }) => {
 
             setFormData({
                 ...unitData,
-                features: unitData.features ? unitData.features.join(', ') : ''
+                features: unitData.features ? unitData.features.join(', ') : '',
+                rent_due_day: unitData.rent_due_day || ''
             });
         } catch (err) {
             console.error('Error fetching unit:', err);
@@ -99,11 +101,12 @@ const UnitEdit = ({ user }) => {
                 name: formData.name,
                 description: formData.description,
                 monthly_rent: parseInt(formData.monthly_rent),
-                fee_per_person: parseInt(formData.fee_per_person),
+                fee_per_person: parseInt(formData.fee_per_person) || 0, // removed input but keep payload for legacy schema
                 deposit: parseInt(formData.deposit) || 0,
                 max_occupants: parseInt(formData.max_occupants),
-                area_m2: parseFloat(formData.area_m2) || 0,
-                features: featuresArray
+                area_m2: parseFloat(formData.area_m2) || 0, // removed input but keep payload
+                features: featuresArray,
+                rent_due_day: formData.rent_due_day ? parseInt(formData.rent_due_day) : null
             };
 
             const devUserId = import.meta.env.VITE_DEV_USER_ID;
@@ -137,7 +140,8 @@ const UnitEdit = ({ user }) => {
                         p_deposit: payload.deposit,
                         p_max_occupants: payload.max_occupants,
                         p_area_m2: payload.area_m2,
-                        p_features: payload.features
+                        p_features: payload.features,
+                        p_rent_due_day: payload.rent_due_day
                     });
                     if (error) throw error;
                 } else {
@@ -151,7 +155,8 @@ const UnitEdit = ({ user }) => {
                         p_deposit: payload.deposit,
                         p_max_occupants: payload.max_occupants,
                         p_area_m2: payload.area_m2,
-                        p_features: payload.features
+                        p_features: payload.features,
+                        p_rent_due_day: payload.rent_due_day
                     });
                     if (error) throw error;
                 }
@@ -191,7 +196,8 @@ const UnitEdit = ({ user }) => {
                             p_deposit: payload.deposit,
                             p_max_occupants: payload.max_occupants,
                             p_area_m2: payload.area_m2,
-                            p_features: payload.features
+                            p_features: payload.features,
+                            p_rent_due_day: payload.rent_due_day
                         });
                         if (rpcError) throw rpcError; // Throw original or new error? Throw new.
                     } else {
@@ -205,7 +211,8 @@ const UnitEdit = ({ user }) => {
                             p_deposit: payload.deposit,
                             p_max_occupants: payload.max_occupants,
                             p_area_m2: payload.area_m2,
-                            p_features: payload.features
+                            p_features: payload.features,
+                            p_rent_due_day: payload.rent_due_day
                         });
                         if (rpcError) throw rpcError;
                     }
@@ -267,6 +274,24 @@ const UnitEdit = ({ user }) => {
                         <div className="form-group">
                             <label className="form-label required">Max. počet osob</label>
                             <input type="number" name="max_occupants" value={formData.max_occupants} onChange={handleChange} required className="form-input" min="1" />
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Den splatnosti nájmu</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <input
+                                type="number"
+                                name="rent_due_day"
+                                value={formData.rent_due_day}
+                                onChange={handleChange}
+                                className="form-input"
+                                min="1"
+                                max="31"
+                                placeholder="např. 15"
+                                style={{ width: '120px' }}
+                            />
+                            <small className="form-hint" style={{ margin: 0 }}>Pokud není vyplněno, použije se nastavení nemovitosti.</small>
                         </div>
                     </div>
 
