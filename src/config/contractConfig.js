@@ -125,7 +125,7 @@ export const contractConfig = {
     <tr>
       <td style="padding: 3px 5px; vertical-align: top;"><strong>Nájemce:</strong></td>
       <td style="padding: 3px 5px;">{{TENANT_NAME}}, nar. {{TENANT_BIRTH_DATE}}, číslo dokladu {{TENANT_BIRTH_NUMBER}}<br>
-      Trvale bytem: {{TENANT_ADDRESS}}<br>
+      {{TENANT_ADDRESS}}<br>
       Telefon: {{TENANT_PHONE}}, e-mail: {{TENANT_EMAIL}}</td>
     </tr>
   </table>
