@@ -163,8 +163,8 @@ export function useContractData() {
                     features: u.features,
                     deposit: u.deposit // Include unit-specific deposit
                 })),
-                meterReadings: (property.settings?.meters && property.settings.meters.length > 0)
-                    ? property.settings.meters
+                meterReadings: propertyMeters.length > 0
+                    ? propertyMeters
                     : (units[0]?.meter_readings || {}),
                 flatEquipment: property.settings?.equipment || [],
                 propertyDetails: property.settings?.propertyDetails || {},

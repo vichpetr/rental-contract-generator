@@ -104,7 +104,7 @@ export const contractConfig = {
 <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.3; color: #000;">
   
   <div style="text-align: center; font-size: 20pt; font-weight: bold; margin: 10px 0;">
-    Nájemní smlouva – pronájem bytu
+    Nájemní smlouva – pronájem pokoje v bytě
     <p style="text-align: center; font-size: 9pt; margin-bottom: 10px;">
     dle § 2235 a násl. zákona č. 89/2012 Sb., občanského zákoníku, ve znění pozdějších předpisů
   </p>
