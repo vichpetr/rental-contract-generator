@@ -11,9 +11,9 @@ import TenantEdit from './pages/TenantEdit';
 import TenantDetail from './pages/TenantDetail';
 import './index.css';
 
-const AppRoutes = ({ user, authorized, basePath }) => (
+const AppRoutes = ({ user, authorized, basePath, isEmbedded }) => (
   <Routes>
-    <Route element={<Layout authorized={authorized} basePath={basePath} />}>
+    <Route element={<Layout authorized={authorized} basePath={basePath} isEmbedded={isEmbedded} />}>
       {/* Redirect root to Properties if authorized, else Generator */}
       {/* Use relative path "" for root match */}
       {/* Redirect root to Properties if authorized, else Generator */}
@@ -97,14 +97,14 @@ function App({ user, session, basename }) {
 
   if (isEmbedded) {
     return (
-      <AppRoutes user={currentUser} authorized={authorized} basePath={appBasePath} />
+      <AppRoutes user={currentUser} authorized={authorized} basePath={appBasePath} isEmbedded={isEmbedded} />
     );
   }
 
   // Standalone mode: We need a Router.
   return (
     <Router basename={basename}>
-      <AppRoutes user={currentUser} authorized={authorized} basePath={appBasePath} />
+      <AppRoutes user={currentUser} authorized={authorized} basePath={appBasePath} isEmbedded={isEmbedded} />
     </Router>
   );
 }
