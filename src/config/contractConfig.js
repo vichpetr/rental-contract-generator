@@ -124,7 +124,7 @@ export const contractConfig = {
     </tr>
     <tr>
       <td style="padding: 3px 5px; vertical-align: top;"><strong>Nájemce:</strong></td>
-      <td style="padding: 3px 5px;">{{TENANT_NAME}}, narozen(a) {{TENANT_BIRTH_NUMBER}}, číslo dokladu: {{TENANT_BIRTH_NUMBER}}<br>
+      <td style="padding: 3px 5px;">{{TENANT_NAME}}, nar. {{TENANT_BIRTH_DATE}}, r.č. {{TENANT_BIRTH_NUMBER}}<br>
       Trvale bytem: {{TENANT_ADDRESS}}<br>
       Telefon: {{TENANT_PHONE}}, e-mail: {{TENANT_EMAIL}}</td>
     </tr>
@@ -134,45 +134,57 @@ export const contractConfig = {
 
   <table cellspacing="0" cellpadding="5" style="width: 100%; border: 2pt solid #000; border-collapse: collapse; margin: 20px 0; font-size: 10pt;">
     <tr>
-      <td colspan="2" style="border-bottom: 1pt solid #000; padding: 7px 5px; font-weight: bold;">
+      <td colspan="3" style="border-bottom: 1pt solid #000; padding: 7px 5px; font-weight: bold;">
         2. PARAMETRY SMLOUVY
       </td>
     </tr>
     <tr>
       <td style="width: 35%; border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">Adresa nemovitosti:</td>
-      <td style="border-bottom: 1pt solid #ccc; padding: 5px;">{{PROPERTY_ADDRESS}}</td>
+      <td colspan="2" style="border-bottom: 1pt solid #ccc; padding: 5px;">{{PROPERTY_ADDRESS}}</td>
+    </tr>
+    <tr>
+      <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">Číslo bytové jednotky:</td>
+      <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px; width: 30%;">{{UNIT_NUMBER}}</td>
+      <td style="border-bottom: 1pt solid #ccc; padding: 5px;">Podlaží: {{FLOOR}}</td>
+    </tr>
+    <tr>
+      <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: <5px;">Výměra a dispozice:</td>
+      <td colspan="2" style="border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{LAYOUT}}</td>
     </tr>
     <tr>
       <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">Doba nájmu na:</td>
-      <td style="border-bottom: 1pt solid #ccc; padding: 5px;">Dobu určitou</td>
+      <td colspan="2" style="border-bottom: 1pt solid #ccc; padding: 5px;">Dobu určitou</td>
     </tr>
     <tr>
       <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">Datum začátku nájmu:</td>
-      <td style="border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{DATE_FROM}}</td>
+      <td colspan="2" style="border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{DATE_FROM}}</td>
     </tr>
     <tr>
       <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">Ukončení nájmu:</td>
-      <td style="border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{DATE_TO}}</td>
+      <td colspan="2" style="border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{DATE_TO}}</td>
     </tr>
     <tr>
       <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">Celkem osob:</td>
-      <td style="border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{OCCUPANTS_COUNT}}</td>
+      <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{OCCUPANTS_COUNT}}</td>
+      <td rowspan="5" style="border-left: 1pt solid #ccc; padding: 5px; text-align: center; vertical-align: middle; width: 160px;">
+        {{QR_PAYMENT}}
+      </td>
     </tr>
     <tr>
       <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">Výše čistého nájemného:</td>
-      <td style="border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{MONTHLY_RENT}} Kč</td>
+      <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{MONTHLY_RENT}} Kč</td>
     </tr>
     <tr>
       <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">Číslo účtu pronajímatele:</td>
-      <td style="border-bottom: 1pt solid #ccc; padding: 5px;">{{BANK_ACCOUNT}}</td>
+      <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">{{BANK_ACCOUNT}}</td>
     </tr>
     <tr>
       <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px;">Splatnost nájmu:</td>
-      <td style="border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{RENT_DUE_DAY}}. den v daném měsíci</td>
+      <td style="border-right: 1pt solid #ccc; border-bottom: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{RENT_DUE_DAY}}. den v daném měsíci</td>
     </tr>
     <tr>
       <td style="border-right: 1pt solid #ccc; padding: 5px;">Výše jistoty:</td>
-      <td style="padding: 5px; font-weight: bold;">{{SECURITY_DEPOSIT}} Kč</td>
+      <td style="border-right: 1pt solid #ccc; padding: 5px; font-weight: bold;">{{SECURITY_DEPOSIT}} Kč</td>
     </tr>
   </table>
 
@@ -216,7 +228,7 @@ export const contractConfig = {
   </ol>
 
   <div style="page-break-inside: avoid;">
-    <p style="page-break-before: always; text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek I.<br>Předmět nájmu</p>
+    <p style="text-align: center; font-weight: bold; margin: 8px 0 3px 0; font-size: 10pt;">Článek I.<br>Předmět nájmu</p>
 
     <ol style="margin: 5px 0 5px 20px; font-size: 9pt;">
       <li style="margin-bottom: 5px;">Pronajímatel je dle výpisu z katastru nemovitostí vedeného příslušným katastrálním úřadem vlastníkem nemovitosti specifikované v položce „Adresa nemovitosti" (dále jen „nemovitost").</li>
@@ -248,7 +260,6 @@ export const contractConfig = {
       <li style="margin-bottom: 5px;">Kromě nájemného se nájemce zavazuje hradit zálohy na služby spojené s užíváním nemovitosti.</li>
     </ol>
     <div style="text-align: center; margin-top: 10px;">
-      {{QR_PAYMENT}}
     </div>
   </div>
 
@@ -321,9 +332,9 @@ export const contractConfig = {
   <table cellspacing="0" cellpadding="3" style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt;">
     <tr>
       <td style="width: 20%; padding: 3px 5px; vertical-align: top;"><strong>Podnájemce:</strong></td>
-      <td style="padding: 3px 5px;">{{SUBTENANT_NAME}}, narozen(a) {{SUBTENANT_BIRTH_NUMBER}}<br>
+      <td style="padding: 3px 5px;">{{SUBTENANT_NAME}}, nar. {{SUBTENANT_BIRTH_DATE}}, r.č. {{SUBTENANT_BIRTH_NUMBER}}<br>
       {{SUBTENANT_ADDRESS}}<br>
-      Tel.: {{SUBTENANT_PHONE}}, email: {{SUBTENANT_EMAIL}}</td>
+      {{SUBTENANT_CONTACT}}</td>
     </tr>
   </table>
   `,
@@ -369,49 +380,28 @@ export const contractConfig = {
     <p style="margin: 0 0 10px 0; font-size: 9pt;">Pokoj je předáván v řádném stavu, čistý a funkční.</p>
   </div>
 
-  <div style="page-break-inside: avoid;">
-    <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">II. VYBAVENÍ POKOJE</p>
-    <div style="margin: 0 0 10px 20px; font-size: 9pt;">{{ROOM_FEATURES}}</div>
-  </div>
+  {{FLAT_EQUIPMENT_SECTION}}
+
+  {{ROOM_EQUIPMENT_SECTION}}
+
+  {{METER_READINGS_SECTION}}
 
   <div style="page-break-inside: avoid;">
-    <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">III. STAVY MĚŘIČŮ</p>
-    <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt;">
-      <tr>
-        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">Elektřina (číslo měřiče: {{ELECTRICITY_METER}}):</td>
-        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 30%;">__________ {{ELECTRICITY_UNIT}}</td>
-      </tr>
-      <tr>
-        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">Studená voda (číslo měřiče: {{COLD_WATER_METER}}):</td>
-        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 30%;">__________ {{COLD_WATER_UNIT}}</td>
-      </tr>
-      <tr>
-        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">Teplá voda (číslo měřiče: {{HOT_WATER_METER}}):</td>
-        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 30%;">__________ {{HOT_WATER_UNIT}}</td>
-      </tr>
-      <tr>
-        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">Plyn (číslo měřiče: {{GAS_METER}}):</td>
-        <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 30%;">__________ {{GAS_UNIT}}</td>
-      </tr>
-    </table>
-  </div>
-
-  <div style="page-break-inside: avoid;">
-    <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">IV. PŘEDÁNÍ KLÍČŮ</p>
+    <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">{{KEYS_SECTION_NUMBER}}. PŘEDÁNÍ KLÍČŮ</p>
     <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt;">
       <tr>
         <td style="padding: 3px 5px;">Počet předaných klíčů od pokoje:</td>
         <td style="padding: 3px 5px; width: 30%;">{{OCCUPANTS_COUNT}}</td>
       </tr>
       <tr>
-        <td style="padding: 3px 5px;">Počet předaných klíčů od vchodu:</td>
+        <td style="padding: 3px 5px;">Počet předaných klíčů/čipů od vchodu:</td>
         <td style="padding: 3px 5px; width: 30%;">{{OCCUPANTS_COUNT}}</td>
       </tr>
     </table>
   </div>
 
   <div style="page-break-inside: avoid;">
-    <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">V. ZÁVĚRY</p>
+    <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">{{CONCLUSION_SECTION_NUMBER}}. ZÁVĚRY</p>
     <p style="margin: 0 0 20px 0; font-size: 9pt;">Nájemce stvrzuje převzetí pokoje ve výše uvedeném stavu a zavazuje se jej v tomto stavu udržovat.</p>
   </div>
 

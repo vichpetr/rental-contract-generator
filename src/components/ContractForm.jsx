@@ -62,6 +62,7 @@ export default function ContractForm({ user }) {
                 firstName: person.first_name,
                 lastName: person.last_name,
                 birthNumber: person.birth_number || '',
+                dateOfBirth: person.date_of_birth || '',
                 address: person.address_street || '',
                 phone: person.phone || '',
                 email: person.email || ''
@@ -88,11 +89,20 @@ export default function ContractForm({ user }) {
                     defaultValue=""
                 >
                     <option value="" disabled>Vyberte uloženého nájemníka...</option>
-                    {savedTenants.map(t => (
-                        <option key={t.id} value={t.id}>
-                            {t.first_name} {t.last_name} ({t.email})
-                        </option>
-                    ))}
+                    {savedTenants.map(t => {
+                        const details = [];
+                        if (t.birth_number) details.push(`Č. dokladu: ${t.birth_number}`);
+                        if (t.email) details.push(t.email);
+                        if (t.phone) details.push(t.phone);
+
+                        const detailStr = details.length > 0 ? ` (${details.join(', ')})` : '';
+
+                        return (
+                            <option key={t.id} value={t.id}>
+                                {t.first_name} {t.last_name}{detailStr}
+                            </option>
+                        );
+                    })}
                 </select>
             </div>
         );
@@ -110,6 +120,7 @@ export default function ContractForm({ user }) {
             firstName: '',
             lastName: '',
             birthNumber: '',
+            dateOfBirth: '',
             address: '',
             phone: '',
             email: ''

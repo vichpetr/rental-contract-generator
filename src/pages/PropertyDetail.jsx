@@ -4,6 +4,187 @@ import { supabase } from '../lib/supabase';
 import { ArrowLeft, Home, Plus, Settings, Edit, Trash2, Users, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 
+const MeterReadingsManager = ({ propertyId }) => {
+    const [meters, setMeters] = useState([]);
+    const [readings, setReadings] = useState({}); // Map: meterId -> []
+    const [loading, setLoading] = useState(false);
+    const [addingReading, setAddingReading] = useState(null); // meterId being added to
+    const [newValue, setNewValue] = useState('');
+    const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
+
+    useEffect(() => {
+        loadMeters();
+    }, [propertyId]);
+
+    const loadMeters = async () => {
+        setLoading(true);
+        try {
+            // Fetch meters via RPC (bypasses RLS)
+            const { data: mData, error } = await supabase
+                .rpc('get_property_meters_with_latest', { target_property_id: propertyId });
+
+            if (error) console.error("Error loading meters:", error);
+
+            if (mData) {
+                // Map RPC result to component state
+                // RPC returns: id, type, description, meter_number, unit, is_active, last_reading_date, last_reading_value
+                setMeters(mData);
+
+                // For full history we still need to fetch readings table?
+                // The updated 'get_property_meters_with_latest' gives specific fields.
+                // But for the history list, we probably want real reading records.
+                // We can fetch readings for these meters manually.
+                // Since I haven't made a specific "get_readings_bypass_rls" RPC, 
+                // we might still face RLS issues for *history detail*.
+                // BUT at least meters will show up now.
+                // Let's try to fetch readings standard way. If RLS fails, we just don't show history list, but we show last reading from RPC.
+
+                const mIds = mData.map(m => m.id);
+                if (mIds.length > 0) {
+                    const { data: rData } = await supabase
+                        .from('meter_readings')
+                        .select('*')
+                        .in('meter_id', mIds)
+                        .order('reading_date', { ascending: false });
+
+                    if (rData) {
+                        const groups = {};
+                        mIds.forEach(id => groups[id] = []);
+                        rData.forEach(r => {
+                            if (groups[r.meter_id]) groups[r.meter_id].push(r);
+                        });
+                        setReadings(groups);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAddReading = async (meterId) => {
+        if (!newValue || !newDate) return;
+        try {
+            const { error } = await supabase.from('meter_readings').insert([{
+                meter_id: meterId,
+                reading_date: newDate,
+                reading_value: parseFloat(newValue)
+            }]);
+            if (error) throw error;
+            setAddingReading(null);
+            setNewValue('');
+            loadMeters(); // Refresh
+        } catch (e) {
+            alert('Chyba: ' + e.message);
+        }
+    };
+
+    const METER_LABELS = {
+        'electricity': 'Elektřina',
+        'gas': 'Plyn',
+        'water_cold': 'Studená voda',
+        'water_hot': 'Teplá voda',
+        'water': 'Voda',
+        'heat': 'Teplo'
+    };
+
+    if (meters.length === 0 && !loading) return <div className="text-muted" style={{ fontStyle: 'italic' }}>Žádné měřiče definovány.</div>;
+
+    return (
+        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+            {meters.map(meter => {
+                const meterReadings = readings[meter.id] || [];
+                const last = meterReadings[0];
+                const prev = meterReadings[1];
+                const consumption = (last && prev) ? (last.reading_value - prev.reading_value).toFixed(2) : null;
+
+                return (
+                    <div key={meter.id} className="card-sub" style={{ background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 'bold' }}>
+                                {METER_LABELS[meter.type] || meter.type}
+                                {meter.description && <span style={{ fontWeight: 'normal', color: 'var(--color-text-secondary)' }}> ({meter.description})</span>}
+                            </h4>
+                            <span className="badge" style={{ background: '#eee', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                                {meter.meter_number}
+                            </span>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', background: '#f9f9f9', padding: '0.5rem', borderRadius: '4px' }}>
+                            <div>
+                                <div style={{ fontSize: '0.75rem', color: '#666' }}>POSLEDNÍ STAV</div>
+                                <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
+                                    {last ? `${last.reading_value} ${meter.unit}` : '-'}
+                                </div>
+                                {last && <div style={{ fontSize: '0.75rem', color: '#999' }}>{format(new Date(last.reading_date), 'd.M.yyyy')}</div>}
+                            </div>
+                            {consumption && (
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: '0.75rem', color: '#666' }}>SPOTŘEBA</div>
+                                    <div style={{ fontWeight: 'bold', color: 'var(--color-primary-600)' }}>
+                                        +{consumption} {meter.unit}
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: '#999' }}>od minula</div>
+                                </div>
+                            )}
+                        </div>
+
+                        {addingReading === meter.id ? (
+                            <div style={{ background: '#f0f7ff', padding: '0.5rem', borderRadius: '4px' }}>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    style={{ marginBottom: '5px', padding: '4px' }}
+                                    value={newDate}
+                                    onChange={e => setNewDate(e.target.value)}
+                                />
+                                <div style={{ display: 'flex', gap: '5px' }}>
+                                    <input
+                                        type="number"
+                                        className="form-input"
+                                        placeholder="Nový stav"
+                                        style={{ padding: '4px' }}
+                                        value={newValue}
+                                        onChange={e => setNewValue(e.target.value)}
+                                    />
+                                    <button onClick={() => handleAddReading(meter.id)} className="btn btn-primary btn-sm">OK</button>
+                                    <button onClick={() => setAddingReading(null)} className="btn btn-secondary btn-sm">Zrušit</button>
+                                </div>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setAddingReading(meter.id)}
+                                className="btn btn-secondary btn-sm"
+                                style={{ width: '100%', border: '1px dashed #ccc' }}
+                            >
+                                + Zadat odečet
+                            </button>
+                        )}
+
+                        {/* History Mini Table */}
+                        {meterReadings.length > 0 && (
+                            <div style={{ marginTop: '0.5rem', maxHeight: '100px', overflowY: 'auto', fontSize: '0.8rem' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <tbody>
+                                        {meterReadings.slice(0, 5).map((r, idx) => (
+                                            <tr key={r.id} style={{ borderBottom: '1px solid #eee' }}>
+                                                <td style={{ padding: '2px' }}>{format(new Date(r.reading_date), 'd.M.yyyy')}</td>
+                                                <td style={{ padding: '2px', textAlign: 'right' }}>{r.reading_value}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
 const PropertyDetail = ({ user }) => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -191,6 +372,25 @@ const PropertyDetail = ({ user }) => {
                         <h3 style={{ fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>Detaily nemovitosti</h3>
                         <p><strong>Sdílená plocha:</strong> {property.shared_area_m2 ? `${property.shared_area_m2} m²` : 'Nezadáno'}</p>
                     </div>
+
+                    {/* Meters Section - New Interactive */}
+                    <div style={{ gridColumn: '1 / -1' }}>
+                        <h3 style={{ fontSize: '1.1rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginBottom: '1rem', letterSpacing: '0.05em', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>
+                            Měřiče a Spotřeba
+                        </h3>
+                        <MeterReadingsManager propertyId={id} />
+                    </div>
+
+                    {property.settings?.equipment && property.settings.equipment.length > 0 && (
+                        <div>
+                            <h3 style={{ fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>Vybavení bytu</h3>
+                            <ul style={{ paddingLeft: '1.2rem', margin: 0 }}>
+                                {property.settings.equipment.map((item, i) => (
+                                    <li key={i}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     {property.landlord_info && (
                         <div>

@@ -128,6 +128,26 @@ export function useContractData() {
 
             const units = finalUnits;
 
+            // Fetch Property Meters (New SQL Source)
+            let propertyMeters = [];
+            const { data: sqlMeters, error: metersError } = await supabase
+                .rpc('get_property_meters_with_latest', { target_property_id: propertyId });
+
+            if (sqlMeters) {
+                propertyMeters = sqlMeters.map(m => ({
+                    type: m.type,
+                    description: m.description,
+                    meterNumber: m.meter_number,
+                    unit: m.unit,
+                    label: m.label // if RPC returns label, though usually we construct it
+                }));
+            } else {
+                // Fallback to settings if RPC fails or empty (legacy behavior backup)
+                if (property.settings?.meters && property.settings.meters.length > 0) {
+                    propertyMeters = property.settings.meters;
+                }
+            }
+
             // Construct Config Object
             const newConfig = {
                 landlord: property.landlord_info,
@@ -143,7 +163,11 @@ export function useContractData() {
                     features: u.features,
                     deposit: u.deposit // Include unit-specific deposit
                 })),
-                meterReadings: units[0]?.meter_readings || {},
+                meterReadings: (property.settings?.meters && property.settings.meters.length > 0)
+                    ? property.settings.meters
+                    : (units[0]?.meter_readings || {}),
+                flatEquipment: property.settings?.equipment || [],
+                propertyDetails: property.settings?.propertyDetails || {},
                 securityDeposit: property.settings.securityDeposit,
                 rentDueDay: property.settings.rentDueDay,
                 noticePeriodMonths: property.settings.noticePeriodMonths,

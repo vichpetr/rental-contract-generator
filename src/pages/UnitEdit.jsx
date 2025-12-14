@@ -261,29 +261,13 @@ const UnitEdit = ({ user }) => {
                             <input type="number" name="monthly_rent" value={formData.monthly_rent} onChange={handleChange} required className="form-input" />
                         </div>
                         <div className="form-group">
-                            <label className="form-label required">Poplatky na osobu (Kč)</label>
-                            <input type="number" name="fee_per_person" value={formData.fee_per_person} onChange={handleChange} required className="form-input" />
-                        </div>
-                        <div className="form-group">
                             <label className="form-label">Jistina (Kč)</label>
                             <input type="number" name="deposit" value={formData.deposit} onChange={handleChange} className="form-input" placeholder="Nepovinné" />
                         </div>
-                    </div>
-
-                    <div className="form-grid form-grid-2">
                         <div className="form-group">
                             <label className="form-label required">Max. počet osob</label>
                             <input type="number" name="max_occupants" value={formData.max_occupants} onChange={handleChange} required className="form-input" min="1" />
                         </div>
-                        <div className="form-group">
-                            <label className="form-label">Plocha (m²)</label>
-                            <input type="number" name="area_m2" value={formData.area_m2} onChange={handleChange} className="form-input" step="0.1" />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Vybavení (oddělené čárkou)</label>
-                        <input type="text" name="features" value={formData.features} onChange={handleChange} placeholder="postel, stůl, skříň" className="form-input" />
                     </div>
 
                     <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>

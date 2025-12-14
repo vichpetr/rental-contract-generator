@@ -87,8 +87,18 @@ export function formatContractData(formData, config, qrCodeDataUrl) {
     const numberOfOccupants = hasSubtenant ? 2 : 1;
 
     // Výpočty
-    const totalFee = calculateTotalFee(roomVariant, numberOfOccupants);
-    const totalMonthly = calculateTotalMonthly(roomVariant, numberOfOccupants);
+    // Výpočty
+    // 1. Calculate services sum (per person)
+    const services = config.servicesBreakdown || { gas: 0, electricity: 0, coldWater: 0, buildingServices: 0 };
+    const serviceSumPerPerson = (services.gas || 0) + (services.electricity || 0) + (services.coldWater || 0) + (services.buildingServices || 0);
+
+    // 2. Total Fee = Service Sum * Occupants
+    // Fallback: If serviceSum is 0, usage roomVariant.feePerPerson (legacy support)
+    const totalFee = serviceSumPerPerson > 0
+        ? serviceSumPerPerson * numberOfOccupants
+        : (roomVariant.feePerPerson * numberOfOccupants);
+
+    const totalMonthly = roomVariant.monthlyRent + totalFee;
 
     // Počet kopií smlouvy
     const copiesCount = hasSubtenant ? 3 : 2;
@@ -106,6 +116,7 @@ export function formatContractData(formData, config, qrCodeDataUrl) {
         // Nájemce
         TENANT_NAME: `${tenant.firstName} ${tenant.lastName}`,
         TENANT_BIRTH_NUMBER: tenant.birthNumber,
+        TENANT_BIRTH_DATE: formatDate(tenant.dateOfBirth),
         TENANT_ADDRESS: tenant.address,
         TENANT_PHONE: tenant.phone,
         TENANT_EMAIL: tenant.email,
@@ -113,7 +124,12 @@ export function formatContractData(formData, config, qrCodeDataUrl) {
         // Pokoj
         ROOM_NAME: roomVariant.name,
         ROOM_AREA: roomVariant.area,
-        PROPERTY_ADDRESS: `${config.property.street}, ${config.property.specificLocation}, ${config.property.postalCode} ${config.property.city}`,
+        PROPERTY_ADDRESS: `${config.property.street}, ${config.property.zip} ${config.property.city}`,
+
+        // Extended Property Details (Parametry Smlouvy)
+        UNIT_NUMBER: config.propertyDetails?.unitNumber || '',
+        FLOOR: config.propertyDetails?.floor || '',
+        LAYOUT: config.propertyDetails?.layout || '',
 
         // Období
         DATE_FROM: formatDate(dateFrom),
@@ -136,11 +152,11 @@ export function formatContractData(formData, config, qrCodeDataUrl) {
             ? `<img src="${qrCodeDataUrl}" alt="QR Platba" style="width: 150px; height: 150px; border: 1px solid #ddd; padding: 5px;">`
             : '',
 
-        // Rozpad služeb
-        SERVICE_GAS: config.servicesBreakdown.gas.toLocaleString('cs-CZ'),
-        SERVICE_ELECTRICITY: config.servicesBreakdown.electricity.toLocaleString('cs-CZ'),
-        SERVICE_WATER: config.servicesBreakdown.coldWater.toLocaleString('cs-CZ'),
-        SERVICE_BUILDING: config.servicesBreakdown.buildingServices.toLocaleString('cs-CZ'),
+        // Rozpad služeb - display calculated totals (per person * occupants)
+        SERVICE_GAS: ((services.gas || 0) * numberOfOccupants).toLocaleString('cs-CZ'),
+        SERVICE_ELECTRICITY: ((services.electricity || 0) * numberOfOccupants).toLocaleString('cs-CZ'),
+        SERVICE_WATER: ((services.coldWater || 0) * numberOfOccupants).toLocaleString('cs-CZ'),
+        SERVICE_BUILDING: ((services.buildingServices || 0) * numberOfOccupants).toLocaleString('cs-CZ'),
 
         // Ostatní
         NOTICE_PERIOD: config.noticePeriodMonths,
@@ -159,9 +175,12 @@ export function formatContractData(formData, config, qrCodeDataUrl) {
         const subtenantData = {
             SUBTENANT_NAME: `${subtenant.firstName} ${subtenant.lastName}`,
             SUBTENANT_BIRTH_NUMBER: subtenant.birthNumber,
+            SUBTENANT_BIRTH_DATE: formatDate(subtenant.dateOfBirth),
             SUBTENANT_ADDRESS: subtenant.address,
-            SUBTENANT_PHONE: subtenant.phone,
-            SUBTENANT_EMAIL: subtenant.email,
+            SUBTENANT_CONTACT: [
+                subtenant.phone ? `Tel.: ${subtenant.phone}` : '',
+                subtenant.email ? `e-mail: ${subtenant.email}` : ''
+            ].filter(Boolean).join(', '),
         };
 
         templateData.SUBTENANT_SECTION = fillTemplate(config.subtenantSection, subtenantData);
@@ -193,20 +212,149 @@ export function formatHandoverProtocolData(formData, config) {
     // This replacement covers formatContractData fully.
 
     const roomVariant = config.roomVariants.find(r => r.id === formData.roomVariantId);
-    const meters = roomVariant.meter_readings || config.meterReadings;
+
+    // Configurable Sections
+    let sections = [];
+    let sectionIndex = 2; // Start from II. (I. is fixed "STAV POKOJE")
+
+    // 1. Flat Equipment (Vybavení bytu)
+    // Check if property has equipment defined in config (it might be in property object or separate)
+    // User asked to add "flat equipment", checking config.flatEquipment (mapped from settings.equipment)
+    const flatEquipment = config.flatEquipment || config.property.equipment || [];
+    let flatEquipmentHtml = '';
+    if (flatEquipment && flatEquipment.length > 0) {
+        flatEquipmentHtml = `
+            <div style="page-break-inside: avoid;">
+                <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">${romanize(sectionIndex)}. VYBAVENÍ BYTU</p>
+                <div style="margin: 0 0 10px 20px; font-size: 9pt;">
+                    ${flatEquipment.map((f, i) => `${i + 1}. ${f}`).join('<br>')}
+                </div>
+            </div>`;
+        sectionIndex++;
+    }
+
+    // 2. Room Equipment (Vybavení pokoje)
+    let roomEquipmentHtml = '';
+    if (roomVariant.features && roomVariant.features.length > 0) {
+        roomEquipmentHtml = `
+            <div style="page-break-inside: avoid;">
+                <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">${romanize(sectionIndex)}. VYBAVENÍ POKOJE</p>
+                <div style="margin: 0 0 10px 20px; font-size: 9pt;">
+                    ${roomVariant.features.map((f, i) => `${i + 1}. ${f}`).join('<br>')}
+                </div>
+            </div>`;
+        sectionIndex++;
+    }
+
+    // 3. Meters (Stavy měřičů)
+    // Logic to parse meters dynamically
+    // Check prioritize: Unit meters (if defined and override property) -> Property meters -> Empty
+    // Actually, usually unit meters override property meters. 
+    // New Logic: Use property.settings.meters (Array) or fallback to unit.meter_readings (Object/Array).
+
+    // Let's resolve the source of meters.
+    // Ideally, the contract config passed here should have the correct meters.
+    // In `useContractData`, we should have populated `config.meterReadings` with the relevant data.
+    // Let's assume config.meterReadings IS the array from property settings (if unit doesn't override).
+
+    const unitMeters = roomVariant.meter_readings || config.meterReadings || [];
+    let metersHtml = '';
+
+    // Helper to extract meters list
+    const getMetersList = (metersSource) => {
+        if (!metersSource) return [];
+
+        // If it's already the new array format
+        if (Array.isArray(metersSource)) {
+            // Map types to user-friendly labels if missing
+            const LABEL_MAP = {
+                'electricity': 'Elektřina',
+                'gas': 'Plyn',
+                'water_cold': 'Studená voda',
+                'water_hot': 'Teplá voda',
+                'water': 'Voda',
+                'heat': 'Teplo'
+            };
+
+            return metersSource.map(m => {
+                const baseLabel = LABEL_MAP[m.type] || m.type;
+                const finalLabel = m.description ? `${baseLabel} (${m.description})` : baseLabel;
+                return {
+                    ...m,
+                    label: m.label || finalLabel
+                };
+            });
+        }
+
+        // Old Object Format Fallback
+        let list = [];
+        if (metersSource.electricity) list.push({ label: 'Elektřina', ...metersSource.electricity });
+        if (metersSource.gas) list.push({ label: 'Plyn', ...metersSource.gas });
+        if (metersSource.water) {
+            if (metersSource.water.cold) list.push({ label: 'Studená voda', ...metersSource.water.cold });
+            if (metersSource.water.hot) list.push({ label: 'Teplá voda', ...metersSource.water.hot });
+            if (metersSource.water.meterNumber) list.push({ label: 'Voda', ...metersSource.water });
+        }
+        return list;
+    };
+
+    const activeMeters = getMetersList(unitMeters);
+
+    if (activeMeters.length > 0) {
+        const rows = activeMeters.map(m => `
+            <tr>
+                <td style="padding: 3px 5px; border-bottom: 1px solid #ccc;">${m.label} (č. měřiče: ${m.meterNumber || m.meter_number || ''}):</td>
+                <td style="padding: 3px 5px; border-bottom: 1px solid #ccc; width: 30%;">__________ ${m.unit || ''}</td>
+            </tr>
+        `).join('');
+
+        metersHtml = `
+            <div style="page-break-inside: avoid;">
+                <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">${romanize(sectionIndex)}. STAVY MĚŘIČŮ</p>
+                <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt;">
+                    ${rows}
+                </table>
+            </div>`;
+        sectionIndex++;
+    }
+
+    // 4. Keys (Predani klicu) -> Update the number for this section in template?
+    // Actually template has fixed "IV. PŘEDÁNÍ KLÍČŮ" and "V. ZÁVĚRY"
+    // To make it fully dynamic, we should probably replacing the whole body or just these sections.
+    // For now, let's keep it simple: formatting logic replaces specific placeholders.
+    // If the user wants fully dynamic numbering for all sections, I'd need to replace the static "IV" and "V" in template too.
+    // Let's assume for now 2&3 are dynamic, and 4&5 are fixed or we update them too using replace.
+    // To do that clean, I'll update the config template to use {{KEYS_SECTION_TITLE}} and {{CONCLUSION_SECTION_TITLE}}.
+
+    // Wait, I can't easily change the template static text from here without changing config.js again.
+    // But I can do a hack: pass "IV." and "V." as variables if I change config.js.
+    // Or I can just replace the hardcoded "IV." and "V." in the result string if I don't want to touch config.
+    // Better: Update Config to use placeholders for section numbers or Titles.
 
     return {
         ...contractData,
-        ROOM_FEATURES: roomVariant.features.map((f, i) => `${i + 1}. ${f}`).join('\n'),
-        ELECTRICITY_METER: meters.electricity.meterNumber,
-        ELECTRICITY_UNIT: meters.electricity.unit,
-        COLD_WATER_METER: meters.water.cold.meterNumber,
-        COLD_WATER_UNIT: meters.water.cold.unit,
-        HOT_WATER_METER: meters.water.hot.meterNumber,
-        HOT_WATER_UNIT: meters.water.hot.unit,
-        GAS_METER: meters.gas.meterNumber,
-        GAS_UNIT: meters.gas.unit,
+        FLAT_EQUIPMENT_SECTION: flatEquipmentHtml,
+        ROOM_EQUIPMENT_SECTION: roomEquipmentHtml,
+        METER_READINGS_SECTION: metersHtml,
+        // Since I removed IV and V from the dynamic replacement zone (they are below), 
+        // I need to make sure they follow the numbering.
+        // I will return the next Roman numerals to be used if I update the template to use them.
+        KEYS_SECTION_NUMBER: romanize(sectionIndex++),
+        CONCLUSION_SECTION_NUMBER: romanize(sectionIndex++)
     };
+}
+
+function romanize(num) {
+    if (isNaN(num)) return NaN;
+    var digits = String(+num).split(""),
+        key = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",
+            "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC",
+            "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"],
+        roman = "",
+        i = 3;
+    while (i--)
+        roman = (key[+digits.pop() + (i * 10)] || "") + roman;
+    return Array(+digits.join("") + 1).join("M") + roman; // basic support
 }
 
 /**
