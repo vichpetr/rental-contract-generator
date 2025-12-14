@@ -226,9 +226,9 @@ export function formatHandoverProtocolData(formData, config) {
         flatEquipmentHtml = `
             <div style="page-break-inside: avoid;">
                 <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 10pt;">${romanize(sectionIndex)}. VYBAVENÍ BYTU</p>
-                <div style="margin: 0 0 10px 20px; font-size: 9pt;">
-                    ${flatEquipment.map((f, i) => `${i + 1}. ${f}`).join('<br>')}
-                </div>
+                <ul style="margin: 0 0 10px 20px; font-size: 9pt; padding-left: 1rem;">
+                    ${flatEquipment.map(f => `<li>${f}</li>`).join('')}
+                </ul>
             </div>`;
         sectionIndex++;
     }
@@ -247,17 +247,17 @@ export function formatHandoverProtocolData(formData, config) {
     }
 
     // 3. Meters (Stavy měřičů)
-    // Logic to parse meters dynamically
-    // Check prioritize: Unit meters (if defined and override property) -> Property meters -> Empty
-    // Actually, usually unit meters override property meters. 
-    // New Logic: Use property.settings.meters (Array) or fallback to unit.meter_readings (Object/Array).
-
-    // Let's resolve the source of meters.
-    // Ideally, the contract config passed here should have the correct meters.
-    // In `useContractData`, we should have populated `config.meterReadings` with the relevant data.
-    // Let's assume config.meterReadings IS the array from property settings (if unit doesn't override).
-
-    const unitMeters = roomVariant.meter_readings || config.meterReadings || [];
+    // Ensure we prioritize valid meters list. roomVariant.meter_readings might be empty object if legacy.
+    let unitMeters = config.meterReadings || [];
+    if (roomVariant.meter_readings && Object.keys(roomVariant.meter_readings).length > 0) {
+        // Only override if really has keys. 
+        // NOTE: If roomVariant.meter_readings is array (legacy array?) or object.
+        if (Array.isArray(roomVariant.meter_readings)) {
+            if (roomVariant.meter_readings.length > 0) unitMeters = roomVariant.meter_readings;
+        } else {
+            unitMeters = roomVariant.meter_readings;
+        }
+    }
     let metersHtml = '';
 
     // Helper to extract meters list
@@ -336,11 +336,8 @@ export function formatHandoverProtocolData(formData, config) {
         FLAT_EQUIPMENT_SECTION: flatEquipmentHtml,
         ROOM_EQUIPMENT_SECTION: roomEquipmentHtml,
         METER_READINGS_SECTION: metersHtml,
-        // Since I removed IV and V from the dynamic replacement zone (they are below), 
-        // I need to make sure they follow the numbering.
-        // I will return the next Roman numerals to be used if I update the template to use them.
-        KEYS_SECTION_NUMBER: romanize(sectionIndex++),
-        CONCLUSION_SECTION_NUMBER: romanize(sectionIndex++)
+        KEYS_SECTION_NUMBER: romanize(sectionIndex),
+        CONCLUSION_SECTION_NUMBER: romanize(sectionIndex + 1)
     };
 }
 
